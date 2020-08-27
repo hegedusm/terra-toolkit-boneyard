@@ -9,6 +9,7 @@ const {
 } = require('../../lib/wdio/services/index');
 const visualRegressionConfig = require('./visualRegressionConf');
 const TerraWDIOSpecReporter = require('../../reporters/wdio/TerraWDIOSpecReporter');
+const Reporter = require('../../reporters/wdio/Reporter');
 
 /* Use to pass your host's IP when running wdio tests from a VM or behind a proxy. */
 const ip = process.env.WDIO_EXTERNAL_HOST || localIP.address();
@@ -117,7 +118,7 @@ const config = {
   reporterOptions: {
     outputDir: path.resolve(process.cwd(), 'tests', 'wdio', 'reports'),
   },
-  reporters: ['dot', TerraWDIOSpecReporter],
+  reporters: ['dot', TerraWDIOSpecReporter, Reporter],
   ...theme && { theme },
 };
 

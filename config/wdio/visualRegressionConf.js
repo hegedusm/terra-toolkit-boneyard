@@ -1,18 +1,10 @@
 const path = require('path');
 const { LocalCompare } = require('wdio-visual-regression-service/compare');
+
 const { terraViewports: VIEWPORTS } = require('./services.default-config');
-var common = require('./commanEmitter');
-var commonEmitter = common.commonEmitter;
-require('../../reporters/wdio/TerraWDIOSpecReporter');
+const TryReporter = require('../../reporters/wdio/Reporter');
 
-// var events = require('events');
-// var em = new events.EventEmitter();
-
-//const cp = require('child_process')
-// var child = cp.fork(__dirname + '../../../reporters/wdio/TerraWDIOSpecReporter.js' )
-// console.log("__dirname ::: ", __dirname);
-
-
+const em = new TryReporter();
 
 const screenshotSetup = {
   diffDir: 'diff',
@@ -97,14 +89,10 @@ function getScreenshotPath(ref) {
 module.exports = {
   compare: new LocalCompare({
     referenceName: getScreenshotPath('reference'),
-    // screenshotName: getScreenshotPath('screenshot'),
     screenshotName: (context) => {
-      console.log("^^^^^^ context :::: ", context);
       const screenshotPath = getScreenshotPath('screenshot')(context);
-      commonEmitter.emit('terra-wdio:latest-screenshot', screenshotPath);
-      // child.send({ 'terra-wdio:latest-screenshot': screenshotPath });
-      // process.send({'terra-wdio:latest-screenshot': screenshotPath});
-      return screenshotPath; 
+      em.emit('terra-wdio:latest-screenshot', screenshotPath);
+      return screenshotPath;
     },
     diffName: getScreenshotPath('diff'),
     misMatchTolerance: 0.01,
