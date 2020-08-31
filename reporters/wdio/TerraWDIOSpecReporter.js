@@ -7,9 +7,6 @@ const Logger = require('../../scripts/utils/logger');
 
 const LOG_CONTEXT = '[Terra-Toolkit:terra-wdio-spec-reporter]';
 
-var common = require('../../config/wdio/commanEmitter');
-var commonEmitter = common.commonEmitter;
-
 class TerraWDIOSpecReporter extends WDIOSpecReporter {
   constructor(globalConfig, options) {
     super(globalConfig);
@@ -38,13 +35,6 @@ class TerraWDIOSpecReporter extends WDIOSpecReporter {
     this.on('runner:end', (runner) => {
       this.runners.push(runner);
     });
-    console.log('TerraWDIOSpecReporter is reading')
-    // this.on('message', function(m) {
-    //   console.log('Just received a message from parent:::: -> ' + JSON.stringify(m));
-    // });
-    commonEmitter.on('terra-wdio:latest-screenshot', (data) => {
-      console.log('listner :', data);
-    })
     
   }
 
