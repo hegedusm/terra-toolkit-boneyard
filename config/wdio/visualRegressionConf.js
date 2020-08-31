@@ -88,7 +88,6 @@ function getScreenshotPath(ref) {
 module.exports = {
   compare: new LocalCompare({
     referenceName: getScreenshotPath('reference'),
-    // screenshotName: getScreenshotPath('screenshot'),
     screenshotName: (context) => {
       const screenshotPath = getScreenshotPath('screenshot')(context);
       em.emit('terra-wdio:latest-screenshot', screenshotPath);
