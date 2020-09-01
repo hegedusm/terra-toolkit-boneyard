@@ -90,7 +90,7 @@ module.exports = {
     referenceName: getScreenshotPath('reference'),
     screenshotName: (context) => {
       const screenshotPath = getScreenshotPath('screenshot')(context);
-      em.emit('terra-wdio:latest-screenshot', screenshotPath);
+      process.send({ event: 'terra-wdio:latest-screenshot', screenshotPath });
       return screenshotPath;
     },
     diffName: getScreenshotPath('diff'),

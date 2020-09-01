@@ -2,18 +2,11 @@ const events = require("events");
 const path = require("path");
 const fs = require("fs");
 const { description } = require("commander");
-events.EventEmitter.defaultMaxListeners = 25
-global.Test = ''
+events.EventEmitter.defaultMaxListeners = 25;
+global.Test = "";
 class TerraWDIOTestDetailsReporter extends events.EventEmitter {
   constructor() {
     super();
-    this.resultsDir = path.resolve(
-      process.cwd(),
-      "tests",
-      "wdio",
-      "reports",
-      "screenshotResult"
-    );
     this.fileName = "";
     this.resultJsonObject = {
       locale: "",
@@ -23,83 +16,73 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
       tests: [],
     };
 
-    this.description = '';
-    this.success = '';
-    this.screenshotLink = '';
-    //this.globalTest = {}
+    this.description = "";
+    this.success = "";
+    this.screenshotLink = "";
+    this.setResultsDir = this.setResultsDir.bind(this);
 
     this.latestScreenshots = [];
-    
 
-    this.on("terra-wdio:latest-screenshot", (screenshotPath) => {
-        console.log(" ____________ terra-wdio:latest-screenshot ____________ ")
-        console.log(" ^^^^^^^^^^^^^ global.Test :::: ", global.Test);
-        this.latestScreenshots.push({
-            [this.description]:screenshotPath
-        })
-        global.Test = screenshotPath;
-        console.log("@@@@@@@ this.latestScreenshots @@@@@ ", this.latestScreenshots);
-        // this.latestScreenshots.push()
-        // console.log("---------- terra-wdio:latest-screenshot array :::", this.latestScreenshots);
+    this.on("terra-wdio:latest-screenshot", ({ screenshotPath }) => {
+      console.log(" ____________ terra-wdio:latest-screenshot ____________ ");
+      this.screenshotLink = screenshotPath;
+      // this.latestScreenshots.push({
+      //     [this.description]:screenshotPath
+      // })
     });
 
     this.on("runner:start", (runner) => {
-        console.log(" ______________ runner:start _________________ ");
-        this.resultJsonObject.locale = runner.config.locale;
-        this.resultJsonObject.browser = runner.capabilities.browserName;
-        this.resultJsonObject.formFactor = runner.capabilities.formFactor;
-        this.resultJsonObject.theme =
-          runner.capabilities.theme || "default-theme";
-        this.fileNameCheck(runner.config, runner.capabilities.browserName);
+      console.log(" ______________ runner:start _________________ ");
+      this.resultJsonObject.locale = runner.config.locale;
+      this.resultJsonObject.browser = runner.capabilities.browserName;
+      this.resultJsonObject.formFactor = runner.capabilities.formFactor;
+      this.resultJsonObject.theme = runner.capabilities.theme || "wdio";
+      this.fileNameCheck(runner.config, runner.capabilities.browserName);
     });
 
     this.on("suite:start", (params) => {
-        console.log(" _____________________ suite:start ______________")
+      console.log(" _____________________ suite:start ______________");
     });
 
     this.on("test:start", (test) => {
-        console.log(" ______________ test:start ______________");
-        this.description = test.title ? test.title : "emptyString";
+      console.log(" ______________ test:start ______________");
+      this.description = test.title;
     });
 
     this.on("test:pass", (test) => {
-        // console.log(" ______________ test:pass _______________");
-        this.success = "success";
-        console.log(" ***** this.latestScreenshots ::: test:pass ___ ", this.latestScreenshots)
+      // console.log(" ______________ test:pass _______________");
+      this.success = "success";
     });
 
     this.on("test:fail", (test) => {
-        // console.log(" _________________ test:fail ________________");
-      this.success = "fail"
-      const filePathLocation = path.join(
-        this.resultsDir,
-        `testFail.json`
-      );
+      // console.log(" _________________ test:fail ________________");
+      this.success = "fail";
+      // const filePathLocation = path.join(this.resultsDir, `testFail.json`);
     });
 
     this.on("test:end", (test) => {
-        console.log("_______________ test:end ______________")
-        const cloneResJson = {...this.resultJsonObject};
-        // console.log("_________ this.screenshotLink __________ ",this.screenshotLink);
-        cloneResJson.tests.push({
-          description: this.description,
-          success: this.success,
-          screenshotLink: this.screenshotLink
-        });
-        // this.description = this.success = this.screenshotLink = '';
-        console.log(" ***** global.Test ::: test:end ___ ", global.Test)
+      console.log("_______________ test:end ______________");
+      const cloneResJson = { ...this.resultJsonObject };
+
+      cloneResJson.tests.push({
+        description: this.description,
+        success: this.success,
+        screenshotLink: this.screenshotLink,
+      });
+      console.log(
+        "_________ test:end ::: this.latestScreenshots __________ ",
+        this.latestScreenshots
+      );
     });
 
-    this.on("suite:end", (suite) => {
-        console.log(" _________________ suite:end ____________");
-        console.log(" ***** global.Test ::: suit:end ___ ", global.Test)
-        // console.log("SuitEnd ::: this.screenshotLink :::", this.screenshotLink);
-    });
+    // this.on("suite:end", (suite) => {
+    //     console.log(" _________________ suite:end ____________");
+    //     // console.log(" ***** global.Test ::: suit:end ___ ", global.Test)
+    //     console.log("SuitEnd ::: this.latestScreenshots :::", this.latestScreenshots);
+    // });
 
     this.on("runner:end", (runner) => {
-        console.log("_____________ runner:end _________________");
-        // console.log("------- latestScreenshots -------", this.latestScreenshots);
-        // console.log("****** resultJsonObject ****** ", this.resultJsonObject);
+      console.log("_____________ runner:end _________________");
       const filePathLocation = path.join(
         this.resultsDir,
         `${this.fileName}.json`
@@ -117,8 +100,22 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
       );
     });
   }
+
+  /**
+   * Sets results directory for the test run
+   * it outputs to tests?/wdio/reports.
+   * @return null;
+   */
+  setResultsDir() {
+    let testDir = 'tests';
+    if (fs.existsSync(path.join(process.cwd(), 'test'))) {
+      testDir = 'test';
+    }
+    this.resultsDir = path.join(process.cwd(), testDir, 'wdio', 'reports', 'details');
+  }
+
   fileNameCheck({ formFactor, locale, theme }, browserName) {
-    const fileNameConf = ["result"];
+    const fileNameConf = ['result'];
     if (locale) {
       fileNameConf.push(locale);
       this.resultJsonObject.locale = locale;
@@ -138,7 +135,7 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
       fileNameConf.push(browserName);
     }
 
-    this.fileName = fileNameConf.join("-");
+    this.fileName = fileNameConf.join('-');
   }
 }
 
