@@ -23,6 +23,8 @@ class TerraWDIOSpecReporter extends WDIOSpecReporter {
     };
     this.fileName = '';
     this.moduleName = process.cwd().split('/').pop();
+    console.log(' !!!!!!!!!!!! process.cwd() :::: ------> ',process.cwd());
+    console.log(' !!!!!!!!!!!! this.moduleName :::: ------> ',this.moduleName);
 
     this.setResultsDir = this.setResultsDir.bind(this);
     this.hasResultsDir = this.hasResultsDir.bind(this);
@@ -112,6 +114,7 @@ class TerraWDIOSpecReporter extends WDIOSpecReporter {
   * @return null
   */
   setTestModule(specsValue) {
+    console.log('WWwwwwwwwwwwww specsValue ::: ',specsValue);
     const index = specsValue.lastIndexOf('packages/');
     if (index > -1) {
       const testFilePath = specsValue.substring(index).split('/');
