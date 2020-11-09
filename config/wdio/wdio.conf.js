@@ -119,7 +119,7 @@ const config = {
   reporterOptions: {
     outputDir: path.resolve(process.cwd(), 'tests', 'wdio', 'reports','details'),
   },
-  reporters: ['dot', TerraWDIOSpecReporter, TerraWDIOTestDetailsReporter],
+  reporters: ['dot', TerraWDIOTestDetailsReporter],
   ...theme && { theme },
 };
 
