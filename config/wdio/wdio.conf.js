@@ -8,7 +8,7 @@ const {
   SeleniumDocker: SeleniumDockerService, ServeStaticService, Terra: TerraService,
 } = require('../../lib/wdio/services/index');
 const visualRegressionConfig = require('./visualRegressionConf');
-// const TerraWDIOSpecReporter = require('../../reporters/wdio/TerraWDIOSpecReporter');
+const TerraWDIOSpecReporter = require('../../reporters/wdio/TerraWDIOSpecReporter');
 const TerraWDIOTestDetailsReporter = require('../../reporters/wdio/TerraWDIOTestDetailsReporter');
 
 
@@ -119,7 +119,7 @@ const config = {
   reporterOptions: {
     outputDir: path.resolve(process.cwd(), 'tests', 'wdio', 'reports','details'),
   },
-  reporters: ['dot', TerraWDIOTestDetailsReporter],
+  reporters: ['dot', TerraWDIOSpecReporter, TerraWDIOTestDetailsReporter],
   ...theme && { theme },
 };
 
