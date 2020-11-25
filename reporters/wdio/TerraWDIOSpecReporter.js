@@ -23,9 +23,6 @@ class TerraWDIOSpecReporter extends WDIOSpecReporter {
     };
     this.fileName = '';
     this.moduleName = process.cwd().split('/').pop();
-    console.log(' !!!!!!!!!!!! process.cwd() :::: ------> ',process.cwd());
-    console.log(' !!!!!!!!!!!! this.moduleName :::: ------> ',this.moduleName);
-
     this.setResultsDir = this.setResultsDir.bind(this);
     this.hasResultsDir = this.hasResultsDir.bind(this);
     this.setTestModule = this.setTestModule.bind(this);
@@ -49,14 +46,14 @@ class TerraWDIOSpecReporter extends WDIOSpecReporter {
   }
 
   /**
-   * Sets results directory for the test run. Uses the wdio reporterOptions.outputDir if set, otherwise
+   * Sets results directory for the test run. Uses the wdio reporterOptions.specReporterOutputDir if set, otherwise
    * it outputs to tests?/wdio/reports.
    * @return null;
    */
   setResultsDir() {
     const { reporterOptions } = this.options;
-    if (reporterOptions && reporterOptions.outputDir) {
-      this.resultsDir = reporterOptions.outputDir;
+    if (reporterOptions && reporterOptions.specReporterOutputDir) {
+      this.resultsDir = reporterOptions.specReporterOutputDir;
     } else {
       let testDir = 'tests';
       if (fs.existsSync(path.join(process.cwd(), 'test'))) {
@@ -114,7 +111,6 @@ class TerraWDIOSpecReporter extends WDIOSpecReporter {
   * @return null
   */
   setTestModule(specsValue) {
-    console.log('WWwwwwwwwwwwww specsValue ::: ',specsValue);
     const index = specsValue.lastIndexOf('packages/');
     if (index > -1) {
       const testFilePath = specsValue.substring(index).split('/');

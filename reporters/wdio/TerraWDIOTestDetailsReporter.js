@@ -12,25 +12,24 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
       theme: "wdio",
       formFactor: "",
       browser: "",
-      tests: [],
+      tests: {},
     };
     this.moduleName = process.cwd().split('/').pop();
-    console.log('process.cwd() :::: ------> ',process.cwd());
     this.setResultsDir.bind(this);
     this.hasResultsDir.bind(this);
     this.setTestModule = this.setTestModule.bind(this);
     this.description = "";
     this.success = "";
     this.screenshotLink = "";
+    this.parent = ""
+    this.child = ""
 
     this.on("terra-wdio:latest-screenshot", (screenshotPath) => {
-      console.log(" ____________ terra-wdio:latest-screenshot ____________ ");
       this.screenshotLink = screenshotPath;
     });
 
     this.on("runner:start", (runner) => {
       this.setTestModule(runner.specs[0]);
-      console.log(" ______________ runner:start _________________ ");
       this.setResultsDir();
       this.hasResultsDir();
       this.resultJsonObject.locale = runner.config.locale;
@@ -43,29 +42,48 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
     });
 
     this.on("suite:start", (params) => {
-      console.log(" _____________________ suite:start ______________");
+      if(params.parent != params.title && params.title && params.title !== this.child){
+        this.child = params.title
+      } else if(params.parent == params.title) {
+        this.child = ''
+      }
+      this.parent = params.parent
     });
 
     this.on("test:start", (test) => {
-      // console.log(" ______________ test:start ______________");
       this.description = test.title;
     });
 
     this.on("test:pass", (test) => {
-      // console.log(" ______________ test:pass _______________");
       this.success = "success";
     });
 
     this.on("test:fail", (test) => {
-      // console.log(" _________________ test:fail ________________");
       this.success = "fail";
     });
 
     this.on("test:end", (test) => {
-      console.log("_______________ test:end ______________");
+      if(!this.resultJsonObject.tests[this.parent]) {
+        this.resultJsonObject.tests[this.parent] = {
+          description: this.parent,
+          tests: []
+        };
+      }
+      if (this.child && !this.resultJsonObject.tests[this.parent][this.child]) {
+        this.resultJsonObject.tests[this.parent][this.child] = {
+          description: this.child,
+          tests: []
+        };
+      }
       const cloneResJson = { ...this.resultJsonObject };
-      if (this.screenshotLink && this.screenshotLink.screenshotPath) {
-        cloneResJson.tests.push({
+        if (this.child && cloneResJson.tests[this.parent][this.child]) {
+        cloneResJson.tests[this.parent][this.child].tests.push({
+          description: this.description,
+          success: this.success,
+          screenshotLink: this.screenshotLink.screenshotPath,
+        });
+      } else {
+        cloneResJson.tests[this.parent].tests.push({
           description: this.description,
           success: this.success,
           screenshotLink: this.screenshotLink.screenshotPath,
@@ -79,7 +97,7 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
         `${this.fileName}.json`
       );
       fs.writeFileSync(
-        filePathLocation,
+        filePathLocation, 
         `${JSON.stringify(this.resultJsonObject, null, 2)}`,
         { flag: "w+" },
         (err) => {
@@ -119,8 +137,8 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
 
   setResultsDir() {
     const { reporterOptions } = this.options;
-    if (reporterOptions && reporterOptions.outputDir) {
-      this.resultsDir = reporterOptions.outputDir;
+    if (reporterOptions && reporterOptions.detailsReporter) {
+      this.resultsDir = reporterOptions.detailsReporter;
     } else {
       let testDir = 'tests';
       if (fs.existsSync(path.join(process.cwd(), 'test'))) {
