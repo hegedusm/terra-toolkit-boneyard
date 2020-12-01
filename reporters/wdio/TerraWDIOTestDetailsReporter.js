@@ -2,6 +2,7 @@ const events = require("events");
 const path = require("path");
 const fs = require("fs");
 const { description } = require("commander");
+const { json } = require("express");
 class TerraWDIOTestDetailsReporter extends events.EventEmitter {
   constructor(globalConfig, options) {
     super(globalConfig);
@@ -12,7 +13,7 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
       theme: "wdio",
       formFactor: "",
       browser: "",
-      tests: {},
+      suites: [],
     };
     this.moduleName = process.cwd().split('/').pop();
     this.setResultsDir.bind(this);
@@ -23,6 +24,8 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
     this.screenshotLink = "";
     this.parent = ""
     this.child = ""
+    this.suitesHasEntry.bind(this);
+    this.testsHasEntry.bind(this);
 
     this.on("terra-wdio:latest-screenshot", (screenshotPath) => {
       this.screenshotLink = screenshotPath;
@@ -42,12 +45,29 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
     });
 
     this.on("suite:start", (params) => {
+      fs.appendFile(
+        path.join(
+          this.resultsDir,
+          `suit_start.json`
+        ), 
+        `${JSON.stringify(params, null, 2)}`,
+        (err) => {
+          if (err) {
+            console.log("err: ", err);
+          }
+        }
+      );
       if(params.parent != params.title && params.title && params.title !== this.child){
+        // console.log("params::: suit:start ::: ", JSON.stringify(params, null, 2));
         this.child = params.title
       } else if(params.parent == params.title) {
         this.child = ''
       }
       this.parent = params.parent
+      console.log(" _____________________________suit:start_______________________________ ")
+      console.log("params.parent, params.title, ",  params.parent, params.title);
+      console.log("this.parent",  this.parent);
+      console.log("this.child",  this.child);
     });
 
     this.on("test:start", (test) => {
@@ -63,31 +83,48 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
     });
 
     this.on("test:end", (test) => {
-      if(!this.resultJsonObject.tests[this.parent]) {
-        this.resultJsonObject.tests[this.parent] = {
-          description: this.parent,
-          tests: []
-        };
+      console.log(" ____________________________________________________________ ")
+      console.log("test:end ::: this.parent ", this.parent );
+      const suiteIndex = this.suitesHasEntry(this.parent)
+      console.log("suiteIndex :::: this.child", suiteIndex, this.child)
+      if(!this.child) {
+        if(this.parent && suiteIndex === -1) {
+          this.resultJsonObject.suites.push({
+            description: this.parent,
+            tests: [{
+              description: this.description,
+              success: this.success,
+              screenshotLink: this.screenshotLink.screenshotPath,
+            }]
+          });
+        } else {
+          this.resultJsonObject.suites[suiteIndex].tests.push({
+            description: this.description,
+            success: this.success,
+            screenshotLink: this.screenshotLink.screenshotPath,
+          })
+        }
       }
-      if (this.child && !this.resultJsonObject.tests[this.parent][this.child]) {
-        this.resultJsonObject.tests[this.parent][this.child] = {
-          description: this.child,
-          tests: []
-        };
-      }
-      const cloneResJson = { ...this.resultJsonObject };
-        if (this.child && cloneResJson.tests[this.parent][this.child]) {
-        cloneResJson.tests[this.parent][this.child].tests.push({
-          description: this.description,
-          success: this.success,
-          screenshotLink: this.screenshotLink.screenshotPath,
-        });
-      } else {
-        cloneResJson.tests[this.parent].tests.push({
-          description: this.description,
-          success: this.success,
-          screenshotLink: this.screenshotLink.screenshotPath,
-        });
+
+      
+      if(this.child) {
+        const testIndex = this.testsHasEntry(this.parent,this.child)
+        if (testIndex === -1 && suiteIndex > 0) {
+          this.resultJsonObject.suites[suiteIndex].tests.push({
+            description: this.child,
+            tests: [{
+              description: this.description,
+              success: this.success,
+              screenshotLink: this.screenshotLink.screenshotPath,
+            }]
+          });
+        } else if(this.resultJsonObject.suites[suiteIndex]) {
+          this.resultJsonObject.suites[suiteIndex].tests[testIndex].tests.push({
+            description: this.description,
+            success: this.success,
+            screenshotLink: this.screenshotLink.screenshotPath,
+          })
+        }
       }
     });
 
@@ -96,6 +133,8 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
         this.resultsDir,
         `${this.fileName}.json`
       );
+      // console.log(" ____________________________________________________________ ")
+      // console.log("this.resultJsonObject ::: runner:end", this.resultJsonObject)
       fs.writeFileSync(
         filePathLocation, 
         `${JSON.stringify(this.resultJsonObject, null, 2)}`,
@@ -107,6 +146,18 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
         }
       );
     });
+  }
+
+  suitesHasEntry(parent) {
+    return this.resultJsonObject.suites.findIndex(({description}) => description === parent)
+  }
+
+  testsHasEntry(parent, child) {
+    const parentIndex = this.resultJsonObject.suites.findIndex(({description}) => description === parent)
+    if (parentIndex > -1) {
+      return this.resultJsonObject.suites[parentIndex].tests.findIndex(({description}) => description === child)
+    }
+    return -1;
   }
 
   setTestModule(specsValue) {
