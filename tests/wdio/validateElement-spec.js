@@ -1,15 +1,4 @@
 Terra.describeViewports('validateElement', ['tiny', 'small', 'huge'], () => {
-  describe('full implementation', () => {
-    before(() => {
-      browser.url('/compare.html');
-    });
-
-    Terra.it.validatesElement();
-
-    it('checks element', () => {
-      Terra.validates.element();
-    });
-  });
 
   describe('inaccessible contrast', () => {
     before(() => browser.url('/inaccessible-contrast.html'));
@@ -24,4 +13,17 @@ Terra.describeViewports('validateElement', ['tiny', 'small', 'huge'], () => {
       Terra.validates.element({ axeRules: ignoredA11y });
     });
   });
+
+  describe('full implementation', () => {
+    before(() => {
+      browser.url('/compare.html');
+    });
+
+    Terra.it.validatesElement();
+
+    it('checks element', () => {
+      Terra.validates.element();
+    });
+  });
 });
+ 
