@@ -1,10 +1,6 @@
 const events = require("events");
 const path = require("path");
 const fs = require("fs");
-const { json } = require("express");
-// const { description } = require("commander");
-// const { json } = require("express");
-// const { cosh } = require("core-js/fn/number");
 class TerraWDIOTestDetailsReporter extends events.EventEmitter {
   constructor(globalConfig, options) {
     super(globalConfig);
@@ -31,17 +27,11 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
     this.description = "";
     this.success = "";
     this.screenshotLink = "";
-    this.grandParent = ""
     this.parent = ""
     this.child = ""
-    this.suiteCount = 0,
-    this.childArray = [],
-    this.parentArray = [],
     this.suitesHasEntry.bind(this);
     this.testsHasEntry.bind(this);
     this.specHashData = {};
-    this.reachedTestEnd = false;
-    // this.parentCount = 0;
 
     this.on("terra-wdio:latest-screenshot", (screenshotPath) => {
       this.screenshotLink = screenshotPath;
@@ -61,39 +51,20 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
     });
 
     this.on("suite:start", (params) => {
-      // console.log("params/;;; suit:start -> ", JSON.stringify(params, null, 2));
       if (!this.specHashData[params.specHash]) {
         this.specHashData[params.specHash] = {}
       }
 
       if (!this.specHashData[params.specHash][params.title]) {
-        //this.specHashData[params.specHash][params.title] = {};
         this.specHashData[params.specHash][params.title] = {
           parent: params.parent,
           description: params.title,
           tests: []
         }
-        // if(params.title === params.parent) {
-        //   this.specHashData[params.specHash][params.title] = {};
-        //   //this.parent = params.parent;
-        // } else if(this.specHashData[params.specHash][params.parent]) {
-        //   this.specHashData[params.specHash][params.parent][params.title] = {}
-        // } else {
-        //   this.specHashData[params.specHash][params.parent] = {}
-        // }
       }
-      //  else{
-      //   console.log("*********** inside the else suit:start ***********");
-      //   this.specHashData[params.specHash][params.parent]({
-      //     [params.title]: []
-      //   })
-      // }
-      // this.suiteCount++;
-      // console.log(" ____________ suit:start _____________ ");
     });
 
     this.on("test:start", (test) => {
-      //console.log("_________ test:start ___________ ", JSON.stringify(test, null,2));
       this.description = test.title;
     });
 
@@ -106,105 +77,6 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
     });
 
     this.on("test:end", (test) => {
-      // fs.appendFile(
-      //   path.join(
-      //     this.resultsDir,
-      //     `test_end.json`
-      //   ), 
-      //   `${JSON.stringify(test, null, 2)}`,
-      //   (err) => {
-      //     if (err) {
-      //       console.log("err: ", err);
-      //     }
-      //   }
-      // );
-      //console.log(" __________________ test End _____________________", JSON.stringify(test, null,2));
-      // console.log("this.grandparent in test:end :::***** ", this.grandParent);
-      // console.log(`parent ::: ${this.parent}, child::: ${this.child}`);
-
-      // console.log("---- this.specHashData ------ ", JSON.stringify(this.specHashData, null,2));
-
-      // if (this.parent && this.child) {
-      //   const parentIndex = this.suitesHasEntry(this.parent)
-      //   const childIndex = this.testsHasEntry(this.parent, this.child)
-      //   // console.log(`this.parent && this.child  - > parentIndex ::: ${parentIndex}, childIndex::: ${childIndex}`);
-      //   if (parentIndex === -1 && childIndex === -1) {
-      //     // for(var i=0; i< this.resultJsonObject.suits.length; i++ ){
-      //     //   for(var j=0; j<this.)
-      //     //   if(this.resultJsonObject.suites[i].test[i].description === this.parent ){
-
-      //     //   }
-      //     // }
-      //     // console.log(`parent name ::: parentIndex === -1 && childIndex === -1 -> parent:  ${this.parent} -> child: ${this.child} -> description: ${this.description}`)
-      //     this.resultJsonObject.suites.push({
-      //       description: this.parent,
-      //       tests: []
-      //     });
-      //     const updatedIndex = this.suitesHasEntry(this.parent);
-      //     // console.log("updatedIndex :----->>>>", updatedIndex);
-      //     this.resultJsonObject.suites[updatedIndex].tests.push({
-      //       description: this.child,
-      //       tests:[{
-      //         description: this.description,
-      //         success: this.success,
-      //         screenshotLink: this.screenshotLink.screenshotPath
-      //       }]
-      //     })
-      //   } else if(parentIndex > -1 && childIndex === -1) {
-      //       // console.log(`parent name ::: parentIndex > -1 && childIndex === -1 -> parent:  ${this.parent} -> child: ${this.child} -> description: ${this.description}`)
-      //       // this.resultJsonObject.suites.push({
-      //       //   description: this.parent,
-      //       //   tests: []
-      //       // });
-      //       //const updatedIndex = this.suitesHasEntry(this.parent);
-      //       //console.log("updatedIndex :----->>>>", updatedIndex);
-      //       this.resultJsonObject.suites[parentIndex].tests.push({
-      //         description: this.child,
-      //         tests:[{
-      //           description: this.description,
-      //           success: this.success,
-      //           screenshotLink: this.screenshotLink.screenshotPath
-      //         }]
-      //       })
-      //     // this.resultJsonObject.suites[parentIndex].tests.push({
-      //     //   description: this.description,
-      //     //   success: this.success,
-      //     //   screenshotLink: this.screenshotLink.screenshotPath,
-      //     // })
-      //   } 
-      //   else {
-      //     // console.log(`parent name  inside else-> parent:  ${this.parent} -> child: ${this.child} -> description: ${this.description}`);
-      //     // console.log("this.resultJsonObject.suites[parentIndex] :::: ", this.resultJsonObject.suites[parentIndex]);
-      //     this.resultJsonObject.suites[parentIndex].tests[childIndex].tests.push({
-      //       description: this.description,
-      //       success: this.success,
-      //       screenshotLink: this.screenshotLink.screenshotPath,
-      //     })
-      //   }
-      // } else if(this.parent && !this.child) {
-      //   const parentIndex = this.suitesHasEntry(this.parent)
-      //   // console.log(`no child only parent  - >  parentIndex ::: ${parentIndex}, parent: ${this.parent}`);
-      //   if (parentIndex > -1) {
-      //     // console.log(`no child only parent && parentIndex > -1   - >  parentIndex ::: ${parentIndex}, parent: ${this.parent}, description: ${this.description}`);
-      //     this.resultJsonObject.suites[parentIndex].tests.push({
-      //       description: this.description,
-      //       success: this.success,
-      //       screenshotLink: this.screenshotLink.screenshotPath,
-      //     })
-      //   } else {
-      //     // console.log("inside else");
-      //     this.resultJsonObject.suites.push({
-      //       description: this.parent,
-      //       tests: [{
-      //         description: this.description,
-      //         success: this.success,
-      //         screenshotLink: this.screenshotLink.screenshotPath,
-      //       }]
-      //     });
-      //   }
-      // }
-      // this.reachedTestEnd = true;
-
       if(this.specHashData[test.specHash]) {
         if(this.specHashData[test.specHash][test.parent]) {
           this.specHashData[test.specHash][test.parent].tests.push({
@@ -214,120 +86,30 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
           })
         }
       }
-      
-      // this.resultJsonObject.suites.push(this.specHashData[test.specHash]);
-      // this.resultJsonObject.suites.forEach(function (suit) {
-      //   console.log("(((((((((((((( : ", suit[test.parent])
-        // if(!suit[test.parent]) {
-          
-        //   this.endResult.suites.push(this.specHashData[test.specHash]);
-        //   console.log("this.endResult ******* ", this.endResult);
-        // }
-      // });
-      
-      // if(this.resultJsonObject.suites.findIndex(({parent}) => parent === test.parent) < 0) {
-      //   this.resultJsonObject.suites.push(this.specHashData[test.specHash]);
-      //   console.log("__________________ : ", this.resultJsonObject.suites.findIndex(({parent}) => parent === test.parent));
-        
-      //   //   // this.resultJsonObject.suites[test.parent] = this.specHashData[test.specHash][test.parent]
-      // }
-      // if(this.resultJsonObject.suites[test.parent].tests.length < 0){
-
-      // }
-      // else{
-      //   // this.resultJsonObject.suites.push(this.specHashData[test.specHash]);
-      // }
-      
-      // const suiteIndex = this.suitesHasEntry(this.parent)
-      // if (this.parent && suiteIndex === -1) {
-      //   this.resultJsonObject.suites.push({
-      //     description: this.parent,
-      //     tests: [{
-      //       description: this.description,
-      //       success: this.success,
-      //       screenshotLink: this.screenshotLink.screenshotPath,
-      //     }]
-      //   });
-      // }
-
-      // console.log(`suit index ::: ${suiteIndex}`)
-      // if(!this.child || (this.suiteCount >= 1 && this.suiteCount <= 3)) {
-      //   if (suiteIndex > -1) {
-      //     this.resultJsonObject.suites[suiteIndex].tests.push({
-      //       description: this.description,
-      //       success: this.success,
-      //       screenshotLink: this.screenshotLink.screenshotPath,
-      //     })
-      //   }
-      //   this.suiteCount = 0;
-      // }
-
-      
-      // if(this.child) {
-      //   const testIndex = this.testsHasEntry(this.parent,this.child)
-      //   console.log(`test index ::: ${testIndex}`)
-      //   if (testIndex === -1 && suiteIndex > -1) {
-      //     this.resultJsonObject.suites[suiteIndex].tests.push({
-      //       description: this.child,
-      //       tests: [{
-      //         description: this.description,
-      //         success: this.success,
-      //         screenshotLink: this.screenshotLink.screenshotPath,
-      //       }]
-      //     });
-      //   } else if(this.resultJsonObject.suites[suiteIndex]) {
-      //     this.resultJsonObject.suites[suiteIndex].tests[testIndex].tests.push({
-      //       description: this.description,
-      //       success: this.success,
-      //       screenshotLink: this.screenshotLink.screenshotPath,
-      //     })
-      //   } else if(testIndex > -1) {
-      //     const parentIndex = this.suitesHasEntry(this.parent)
-      //     this.resultJsonObject.suites[parentIndex].tests[testIndex].tests.push({
-      //       description: this.description,
-      //       success: this.success,
-      //       screenshotLink: this.screenshotLink.screenshotPath,
-      //     })
-      //   } else {
-      //     const parentIndex = this.suitesHasEntry(this.parent)
-      //     this.resultJsonObject.suites[parentIndex].tests.push({
-      //       description: this.child,
-      //       tests: [{
-      //         description: this.description,
-      //         success: this.success,
-      //         screenshotLink: this.screenshotLink.screenshotPath,
-      //       }]
-      //     });
-      //   }
-      // }
-      //this.suiteCount = 0;
     });
 
     this.on("runner:end", (runner) => {
-      console.log("__________ specHashData >>>>>>>>>>>> ", JSON.stringify(this.specHashData, null,2));
-      // fs.writeFileSync(
-      //   path.join(
-      //     this.resultsDir,
-      //     'specdata.json'),  
-      //   `${JSON.stringify(this.specHashData, null, 2)}`,
-      //   { flag: "w+" },
-      //   (err) => {
-      //     if (err) {
-      //       Logger.error(err.message, { context: LOG_CONTEXT });
-      //     }
-      //   }
-      // );
-      var arrayData = this.specHashData
-      // console.log("__________ runner end ___________");
+      Object.values(this.specHashData).forEach((spec, i) => {
+        const revSpecs = Object.values(spec)
+        revSpecs.forEach((test) => {
+          if(test.parent !== test.description) {
+            const parentIndex = revSpecs.findIndex(item => item.description === test.parent)
+            if(parentIndex > -1) {
+              revSpecs[parentIndex].tests.push(test);
+              delete test.parent;
+            }
+          }
+          delete test.parent;
+        })
+        this.resultJsonObject.suites.push(revSpecs.shift());
+      })
       const filePathLocation = path.join(
         this.resultsDir,
         `${this.fileName}.json`
       );
-      // console.log(" ____________________________________________________________ ")
-      // console.log("this.resultJsonObject ::: runner:end", this.resultJsonObject)
       fs.writeFileSync(
         filePathLocation, 
-        `${JSON.stringify(this.endResult, null, 2)}`,
+        `${JSON.stringify(this.resultJsonObject, null, 2)}`,
         { flag: "w+" },
         (err) => {
           if (err) {
@@ -335,40 +117,7 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
           }
         }
       );
-    });
-    this.on('suite:end', suite => {
-      // console.log("_________suit:end __________");
-      // const suiteStat = this.suites[suite.uid];
-      // suiteStat.complete();
-      // this.currentSuites.pop();
-      // this.onSuiteEnd(suiteStat);
-      // this.childArray = [];
-      // this.parentArray = [];
-      // fs.appendFile(
-      //   path.join(
-      //     this.resultsDir,
-      //     `suite_end.json`
-      //   ), 
-      //   `${JSON.stringify(suite, null, 2)}`,
-      //   (err) => {
-      //     if (err) {
-      //       console.log("err: ", err);
-      //     }
-      //   }
-      // );
-      fs.appendFile(
-        path.join(
-          this.resultsDir,
-          `spechHash_data.json`
-        ), 
-        `${JSON.stringify(this.specHashData, null, 2)}`,
-        (err) => {
-          if (err) {
-            console.log("err: ", err);
-          }
-        }
-      );
-      
+      this.specHashData = {}
     });
   }
 
