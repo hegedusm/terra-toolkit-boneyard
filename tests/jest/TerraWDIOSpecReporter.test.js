@@ -49,7 +49,7 @@ describe('TerraWDIOSpecReporter', () => {
       });
 
       it('when outputDir is defined in configuration', () => {
-        const reporter = new TerraWDIOSpecReporter({}, { reporterOptions: { outputDir: 'my-test-reports/wdio' } });
+        const reporter = new TerraWDIOSpecReporter({}, { reporterOptions: { specReporterOutputDir: 'my-test-reports/wdio' } });
         expect(reporter.resultsDir).toEqual('my-test-reports/wdio');
       });
     });
