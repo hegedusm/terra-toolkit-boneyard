@@ -1,9 +1,12 @@
+// import { expect } from 'chai';
+import { EventEmitter } from 'events';
 import fs from 'fs';
+import { report } from 'process';
 import TerraWDIOTestDetailsReporter from '../../reporters/wdio/TerraWDIOTestDetailsReporter';
 
 jest.mock('fs');
 
-describe('TerraWDIOTestDetailsReporter', () => {
+describe.only('TerraWDIOTestDetailsReporter', () => {
   const originalProcessCwd = process.cwd;
   beforeAll(() => {
     process.cwd = jest.fn().mockImplementation(() => './terra-toolkit-boneyard');
@@ -137,4 +140,128 @@ describe('TerraWDIOTestDetailsReporter', () => {
       expect(reporter.moduleName).toEqual('');
     });
   });
+
+  describe('test:start', () => {
+      it('test:start description should set ', () => {
+        const reporter = new TerraWDIOTestDetailsReporter({}, {});
+       reporter.emit('test:start', {title: 'title of the it'})
+        expect(reporter.description).toEqual('title of the it')
+    })
+})
+    describe('reaches test:pass or test:fail', () => {
+        it('test:pass description should set ', () => {
+            const reporter = new TerraWDIOTestDetailsReporter({}, {});
+            reporter.emit('test:pass', {success: 'success'})
+            expect(reporter.success).toEqual('success')
+        })
+        it('test:fail description should set ', () => {
+            const reporter = new TerraWDIOTestDetailsReporter({}, {});
+            reporter.emit('test:fail', {success: 'fail'})
+            expect(reporter.success).toEqual('fail')
+        })
+    })
+
+    describe('terra-wdio:latest-screenshot', () => {
+        it('terra-wdio:latest-screenshotshould set screenshotLink', () => {
+            const reporter = new TerraWDIOTestDetailsReporter({}, {});
+            reporter.emit('terra-wdio:latest-screenshot', {screenshotLink: 'opt/Image.png'})
+            expect(reporter.screenshotLink).toEqual({"screenshotLink": "opt/Image.png"})
+        })
+    })
+    describe('runner:start', () => {
+        it('runner:start should call the funtions', () => {
+            const runner = {
+                    "event": "runner:start",
+                    "cid": "0-1",
+                    "specs": [
+                      "/opt/module/tests/wdio/validateElement-spec.js"
+                    ],
+                    "capabilities": {
+                      "browserName": "chrome",
+                      "maxInstances": 1,
+                    },
+                    "config": {
+                      "host": "standalone-chrome",
+                      "port": 4444,
+                      "sync": true,
+                      "specs": [
+                        "test*/wdio/**/*-spec.js"
+                      ],
+                      "locale": "fr",
+                      "formFactor": "huge",
+                      "desiredCapabilities": {
+                        "browserName": "chrome",
+                        "maxInstances": 1,
+                      }
+                    },
+                    "specHash": "fa372c346f402d6e30314f44107e880c"
+                  
+            }
+            const reporter = new TerraWDIOTestDetailsReporter({}, {});
+            reporter.emit('runner:start', runner);
+            reporter.setTestModule(runner.specs[0]);
+            reporter.setResultsDir();
+            reporter.hasResultsDir();
+            // this.resultJsonObject.locale = runner.config.locale;
+            // this.resultJsonObject.browser = runner.config.desiredCapabilities.browserName;
+            // this.resultJsonObject.formFactor = runner.config.formFactor;
+            // this.resultJsonObject.theme =
+            //   runner.capabilities.theme || "default-theme";
+            
+            expect(reporter.resultJsonObject.locale ).toEqual('fr')
+            expect(reporter.resultJsonObject.browser ).toEqual('chrome')
+            expect(reporter.resultJsonObject.formFactor ).toEqual('huge')
+            expect(reporter.resultJsonObject.theme ).toEqual('default-theme')
+            reporter.fileNameCheck(runner.config, runner.capabilities);
+        })
+    })
+    describe('suite:start', () => {
+        it('suite:start for mono repo', () => {
+            const reporter = new TerraWDIOTestDetailsReporter({}, {});
+            const params = {
+                "specHash" : "f75728c9953420794e669cae74b03d58",
+                "title": "group2",
+                "parent": "hideInputCaret"
+            }
+            reporter.moduleName = "terra-clinical";
+            reporter.emit('suite:start', params)
+            expect(reporter.specHashData).toHaveProperty(reporter.moduleName);
+            console.log("reporter.specHashData[params.specHash][params.title] :::: ", reporter.specHashData);
+            expect(reporter.specHashData[reporter.moduleName][params.specHash][params.title]).toHaveProperty('parent');
+            expect(reporter.specHashData[reporter.moduleName][params.specHash][params.title]).toHaveProperty('description');
+            expect(reporter.specHashData[reporter.moduleName][params.specHash][params.title]).toHaveProperty('tests');
+            expect(typeof reporter.specHashData[reporter.moduleName][params.specHash][params.title].tests).toEqual('object')
+
+        })
+        it('suite:start for non mono repo', () => {
+          const reporter = new TerraWDIOTestDetailsReporter({}, {});
+          const params = {
+              "specHash" : "f75728c9953420794e669cae74b03d58",
+              "title": "group2",
+              "parent": "hideInputCaret"
+          }
+          //reporter.moduleName = "terra-clinical";
+          reporter.emit('suite:start', params)
+          expect(reporter.specHashData).not.toHaveProperty(reporter.moduleName);
+          // console.log("reporter.specHashData[params.specHash][params.title] :::: ", reporter.specHashData);
+          expect(reporter.specHashData[params.specHash][params.title]).toHaveProperty('parent');
+          expect(reporter.specHashData[params.specHash][params.title]).toHaveProperty('description');
+          expect(reporter.specHashData[params.specHash][params.title]).toHaveProperty('tests');
+          expect(typeof reporter.specHashData[params.specHash][params.title].tests).toEqual('object')
+
+      })
+    })
+    // describe('runner:end', () => {
+    //     it('suite:start for mono repo', () => {
+    //         const reporter = new TerraWDIOTestDetailsReporter({}, {});
+    //         reporter.moduleName = "terra-clinical";
+    //         reporter.emit('runner:end')
+    //         console.log("reporter.specHashData[reporter.moduleName] : ",reporter.specHashData[reporter.moduleName])
+    //         expect(reporter.resultJsonObject).toHaveProperty(suites);
+    //         expect(typeof reporter.resultJsonObject).toEqual('object')
+    //         expect(reporter.resultJsonObject.length).to.be.above(0);
+    //         expect(fs.writeFileSync).toHaveBeenCalled();
+
+    //     })
+    // })
 });
