@@ -29,7 +29,6 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
     });
 
     this.on("runner:start", (runner) => {
-      // console.log("runner ::: ", JSON.stringify(runner, null, 2));
       this.setTestModule(runner.specs[0]);
       this.setResultsDir();
       this.hasResultsDir();
@@ -43,7 +42,6 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
     });
 
     this.on("suite:start", (params) => {
-      console.log("params in suit:start ->  ::: ", JSON.stringify(params, null, 2));
       if (this.moduleName) {
         if (!this.specHashData[this.moduleName]) {
           this.specHashData[this.moduleName] = []
@@ -73,11 +71,9 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
           }
         }
       }
-      // console.log("this.spech data:::: ", this.specHashData);
     });
 
     this.on("test:start", (test) => {
-      // console.log("test:start : ", test.title);
       this.description = test.title;
     });
 
@@ -116,7 +112,6 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
     });
 
     this.on("runner:end", (runner) => {
-      // console.log("__________________ :::: ", this.specHashData);
       const specData = this.moduleName ? this.specHashData[this.moduleName] : this.specHashData
       Object.values(specData).forEach((spec, i) => {
         const revSpecs = Object.values(spec)
@@ -131,7 +126,7 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
           delete test.parent;
         })
         if (this.moduleName) {
-          this.resultJsonObject.suites[this.moduleName].push(revSpecs.shift())
+          this.resultJsonObject.suites[this.moduleName] = revSpecs.shift();
         }
         else {
           this.nonMonoRepoResult.push(revSpecs.shift());

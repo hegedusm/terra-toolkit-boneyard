@@ -1,4 +1,3 @@
-// import { expect } from 'chai';
 import { EventEmitter } from 'events';
 import fs from 'fs';
 import { report } from 'process';
@@ -202,12 +201,6 @@ describe.only('TerraWDIOTestDetailsReporter', () => {
             reporter.setTestModule(runner.specs[0]);
             reporter.setResultsDir();
             reporter.hasResultsDir();
-            // this.resultJsonObject.locale = runner.config.locale;
-            // this.resultJsonObject.browser = runner.config.desiredCapabilities.browserName;
-            // this.resultJsonObject.formFactor = runner.config.formFactor;
-            // this.resultJsonObject.theme =
-            //   runner.capabilities.theme || "default-theme";
-            
             expect(reporter.resultJsonObject.locale ).toEqual('fr')
             expect(reporter.resultJsonObject.browser ).toEqual('chrome')
             expect(reporter.resultJsonObject.formFactor ).toEqual('huge')
@@ -240,10 +233,8 @@ describe.only('TerraWDIOTestDetailsReporter', () => {
               "title": "group2",
               "parent": "hideInputCaret"
           }
-          //reporter.moduleName = "terra-clinical";
           reporter.emit('suite:start', params)
           expect(reporter.specHashData).not.toHaveProperty(reporter.moduleName);
-          // console.log("reporter.specHashData[params.specHash][params.title] :::: ", reporter.specHashData);
           expect(reporter.specHashData[params.specHash][params.title]).toHaveProperty('parent');
           expect(reporter.specHashData[params.specHash][params.title]).toHaveProperty('description');
           expect(reporter.specHashData[params.specHash][params.title]).toHaveProperty('tests');
@@ -251,17 +242,68 @@ describe.only('TerraWDIOTestDetailsReporter', () => {
 
       })
     })
-    // describe('runner:end', () => {
-    //     it('suite:start for mono repo', () => {
-    //         const reporter = new TerraWDIOTestDetailsReporter({}, {});
-    //         reporter.moduleName = "terra-clinical";
-    //         reporter.emit('runner:end')
-    //         console.log("reporter.specHashData[reporter.moduleName] : ",reporter.specHashData[reporter.moduleName])
-    //         expect(reporter.resultJsonObject).toHaveProperty(suites);
-    //         expect(typeof reporter.resultJsonObject).toEqual('object')
-    //         expect(reporter.resultJsonObject.length).to.be.above(0);
-    //         expect(fs.writeFileSync).toHaveBeenCalled();
+    describe('runner:end', () => {
+        it('suite:start for mono repo', () => {
+            const reporter = new TerraWDIOTestDetailsReporter({}, {});
+            reporter.specHashData  =  { 'terra-clinical-data-grid':
+            { f75728c9953420794e669cae74b03d58:
+              { hideInputCaret:
+                 { parent: 'hideInputCaret',
+                   description: 'hideInputCaret',
+                   tests: [
+                    {
+                      "description": "Express correctly sets the application locale",
+                      "success": "success"
+                    },
+                    {
+                      "description": "[default] to be within the mismatch tolerance",
+                      "success": "success",
+                      "screenshotLink": "/opt/module/tests/wdio/__snapshots__/latest/fr/chrome_huge/i18n-spec/I18n_Locale[default].png"
+                    }
+                   ] 
+                  },
+              }
+             }
+            }
+         
+            reporter.moduleName = "terra-clinical-data-grid";
+            reporter.emit('runner:end')
+            console.log("reporter.resultJsonObject ::: ", reporter.resultJsonObject);
+            expect(reporter.resultJsonObject).toHaveProperty('suites');
+            expect(typeof reporter.resultJsonObject).toEqual('object')
+            expect(reporter.resultJsonObject.suites[reporter.moduleName].tests.length).toBeGreaterThanOrEqual(1);
+            expect(fs.writeFileSync).toHaveBeenCalled();
 
-    //     })
-    // })
+        })
+        it('suite:start for non mono repo', () => {
+          const reporter = new TerraWDIOTestDetailsReporter({}, {});
+          reporter.specHashData  =  {
+            "f75728c9953420794e669cae74b03d58": {
+              "hideInputCaret": {
+                "parent": "hideInputCaret",
+                "description": "hideInputCaret",
+                "tests": []
+              },
+              "group1": {
+                "parent": "hideInputCaret",
+                "description": "group1",
+                "tests": [
+                  {
+                    "description": "validates the textarea's caret-color is inherited as transparent",
+                    "success": "success",
+                    "screenshotLink": "/opt/module/tests/wdio/__snapshots__/latest/en/chrome_tiny/validateElement-spec/full_implementation[default].png"
+                  }
+                ]
+              }
+            }
+          }          
+          reporter.emit('runner:end')
+          console.log("reporter.resultJsonObject ::: ", reporter.resultJsonObject);
+          expect(reporter.resultJsonObject).toHaveProperty('suites');
+          expect(typeof reporter.resultJsonObject).toEqual('object')
+          expect(reporter.resultJsonObject.suites.length).toBeGreaterThanOrEqual(1);
+          expect(fs.writeFileSync).toHaveBeenCalled();
+
+      })
+    })
 });
