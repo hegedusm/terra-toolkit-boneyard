@@ -177,8 +177,8 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
   setTestModule(specsValue) {
     const index = specsValue.lastIndexOf('packages/');
     if (index > -1) {
-      const testFilePath = specsValue.substring(index).split('/');
-      const moduleName = testFilePath && testFilePath[1] ? testFilePath[1] : process.cwd().split('/').pop();
+      const testFilePath = specsValue.substring(index).split(path.sep);
+      const moduleName = testFilePath && testFilePath[1] ? testFilePath[1] : process.cwd().split(path.sep).pop();
       if (moduleName && moduleName !== this.moduleName) {
         this.moduleName = moduleName;
       }
