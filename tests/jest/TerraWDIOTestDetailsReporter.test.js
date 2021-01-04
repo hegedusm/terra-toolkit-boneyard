@@ -1,6 +1,4 @@
-import { EventEmitter } from 'events';
 import fs from 'fs';
-import { report } from 'process';
 import TerraWDIOTestDetailsReporter from '../../reporters/wdio/TerraWDIOTestDetailsReporter';
 
 jest.mock('fs');
@@ -219,7 +217,6 @@ describe.only('TerraWDIOTestDetailsReporter', () => {
             reporter.moduleName = "terra-clinical";
             reporter.emit('suite:start', params)
             expect(reporter.specHashData).toHaveProperty(reporter.moduleName);
-            console.log("reporter.specHashData[params.specHash][params.title] :::: ", reporter.specHashData);
             expect(reporter.specHashData[reporter.moduleName][params.specHash][params.title]).toHaveProperty('parent');
             expect(reporter.specHashData[reporter.moduleName][params.specHash][params.title]).toHaveProperty('description');
             expect(reporter.specHashData[reporter.moduleName][params.specHash][params.title]).toHaveProperty('tests');
@@ -268,7 +265,6 @@ describe.only('TerraWDIOTestDetailsReporter', () => {
          
             reporter.moduleName = "terra-clinical-data-grid";
             reporter.emit('runner:end')
-            console.log("reporter.resultJsonObject ::: ", reporter.resultJsonObject);
             expect(reporter.resultJsonObject).toHaveProperty('suites');
             expect(typeof reporter.resultJsonObject).toEqual('object')
             expect(reporter.resultJsonObject.suites[reporter.moduleName].tests.length).toBeGreaterThanOrEqual(1);
@@ -298,7 +294,6 @@ describe.only('TerraWDIOTestDetailsReporter', () => {
             }
           }          
           reporter.emit('runner:end')
-          console.log("reporter.resultJsonObject ::: ", reporter.resultJsonObject);
           expect(reporter.resultJsonObject).toHaveProperty('suites');
           expect(typeof reporter.resultJsonObject).toEqual('object')
           expect(reporter.resultJsonObject.suites.length).toBeGreaterThanOrEqual(1);

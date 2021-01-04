@@ -41,32 +41,38 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
 
     });
 
+    /**
+    * Format class member specHashData with runner's specHash. If its monorepo formatting the specHash inside the moduleName
+    * @param {Object} params
+    * @return null
+    */
     this.on("suite:start", (params) => {
+      const { specHash, title, parent } = params
+      let specHashData = this.specHashData
       if (this.moduleName) {
         if (!this.specHashData[this.moduleName]) {
-          this.specHashData[this.moduleName] = []
+          this.specHashData[this.moduleName] = {}
+          specHashData = this.specHashData
         }
-        if (!this.specHashData[this.moduleName][params.specHash]) {
-          this.specHashData[this.moduleName][params.specHash] = {}
+        if (!specHashData[this.moduleName][specHash]) {
+          specHashData[this.moduleName][specHash] = {}
         }
-
-        if (!this.specHashData[this.moduleName][params.specHash][params.title]) {
-          this.specHashData[this.moduleName][params.specHash][params.title] = {
-            parent: params.parent,
-            description: params.title,
+  
+        if (!specHashData[this.moduleName][specHash][title]) {
+          specHashData[this.moduleName][specHash][title] = {
+            parent,
+            description: title,
             tests: []
           }
         }
-      }
-      else {
-        if (!this.specHashData[params.specHash]) {
-          this.specHashData[params.specHash] = {}
+      } else {
+        if (!specHashData[specHash]) {
+          specHashData[specHash] = {}
         }
-
-        if (!this.specHashData[params.specHash][params.title]) {
-          this.specHashData[params.specHash][params.title] = {
-            parent: params.parent,
-            description: params.title,
+        if (!specHashData[specHash][title]) {
+          specHashData[specHash][title] = {
+            parent,
+            description: title,
             tests: []
           }
         }
@@ -85,11 +91,17 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
       this.success = "fail";
     });
 
+    /**
+    * update specHashData with description, success, screenshotLink 
+    * @param {Object} test 
+    * @return null
+    */
     this.on("test:end", (test) => {
+      const { specHash, parent } = test
       if(this.moduleName) {
-        if (this.specHashData[this.moduleName][test.specHash]) {
-          if (this.specHashData[this.moduleName][test.specHash][test.parent]) {
-            this.specHashData[this.moduleName][test.specHash][test.parent].tests.push({
+        if (this.specHashData[this.moduleName][specHash]) {
+          if (this.specHashData[this.moduleName][specHash][parent]) {
+            this.specHashData[this.moduleName][specHash][parent].tests.push({
               description: this.description,
               success: this.success,
               screenshotLink: this.screenshotLink.screenshotPath,
@@ -98,9 +110,9 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
         }
       }
       else {
-        if (this.specHashData[test.specHash]) {
-          if (this.specHashData[test.specHash][test.parent]) {
-            this.specHashData[test.specHash][test.parent].tests.push({
+        if (this.specHashData[specHash]) {
+          if (this.specHashData[specHash][parent]) {
+            this.specHashData[specHash][parent].tests.push({
               description: this.description,
               success: this.success,
               screenshotLink: this.screenshotLink.screenshotPath,
@@ -111,7 +123,11 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
       
     });
 
-    this.on("runner:end", (runner) => {
+    /**
+    * Format resultJsonObject based on parent and nest the tests
+    * @return null
+    */
+    this.on("runner:end", () => {
       const specData = this.moduleName ? this.specHashData[this.moduleName] : this.specHashData
       Object.values(specData).forEach((spec, i) => {
         const revSpecs = Object.values(spec)

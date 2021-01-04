@@ -57,9 +57,7 @@ const describeViewports = (title, viewports, fn) => {
   }
 
   let currentViewportSize;
-  console.log(" ***** localViewports :::: ", localViewports);
   localViewports.forEach(viewport => global.describe(`[${viewport}]`, () => {
-    console.log(" ______ viewport :: ",viewport )
     global.before(() => {
       currentViewportSize = global.browser.getViewportSize();
       setViewport(viewport);
