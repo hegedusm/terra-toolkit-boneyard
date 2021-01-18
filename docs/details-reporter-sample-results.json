@@ -1,0 +1,112 @@
+{
+    "locale": "en",
+    "theme": "default-theme",
+    "formFactor": "huge",
+    "browser": "chrome",
+    "suites": [
+      {
+        "description": "I18n Locale",
+        "tests": [
+          {
+            "description": "Express correctly sets the application locale",
+            "success": "success"
+          },
+          {
+            "description": "matches screenshot",
+            "success": "success",
+            "screenshotLink": "/opt/module/tests/wdio/__snapshots__/latest/en/chrome_huge/i18n-spec/I18n_Locale[default].png"
+          }
+        ]
+      },
+      {
+        "description": "[huge]",
+        "tests": [
+          {
+            "description": "validateElement",
+            "tests": [
+              {
+                "description": "full implementation",
+                "tests": [
+                  {
+                    "description": "checks element",
+                    "success": "success",
+                    "screenshotLink": "/opt/module/tests/wdio/__snapshots__/latest/en/chrome_huge/validateElement-spec/full_implementation[default].png"
+                  },
+                  {
+                    "description": "[default] is accessible and is within the mismatch tolerance",
+                    "success": "success",
+                    "screenshotLink": "/opt/module/tests/wdio/__snapshots__/latest/en/chrome_huge/validateElement-spec/full_implementation[default].png"
+                  },
+                  {
+                    "description": "checks element",
+                    "success": "success",
+                    "screenshotLink": "/opt/module/tests/wdio/__snapshots__/latest/en/chrome_huge/validateElement-spec/full_implementation[default].png"
+                  }
+                ]
+              },
+              {
+                "description": "inaccessible contrast",
+                "tests": [
+                  {
+                    "description": "checks element",
+                    "success": "success",
+                    "screenshotLink": "/opt/module/tests/wdio/__snapshots__/latest/en/chrome_huge/validateElement-spec/inaccessible_contrast[default].png"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "description": "hideInputCaret",
+        "tests": [
+          {
+            "description": "group1",
+            "tests": [
+              {
+                "description": "validates the textarea's caret-color is inherited as transparent",
+                "success": "success",
+                "screenshotLink": "/opt/module/tests/wdio/__snapshots__/latest/en/chrome_huge/validateElement-spec/full_implementation[default].png"
+              },
+              {
+                "description": "group1 inner describe",
+                "tests": [
+                  {
+                    "description": "validates the body's caret-color is transparent by default",
+                    "success": "success",
+                    "screenshotLink": "/opt/module/tests/wdio/__snapshots__/latest/en/chrome_huge/validateElement-spec/full_implementation[default].png"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "description": "group2",
+            "tests": [
+              {
+                "description": "validates the input's caret-color is inherited as transparent",
+                "success": "success",
+                "screenshotLink": "/opt/module/tests/wdio/__snapshots__/latest/en/chrome_huge/validateElement-spec/full_implementation[default].png"
+              },
+              {
+                "description": "sets the input's caret-color to orange",
+                "success": "success",
+                "screenshotLink": "/opt/module/tests/wdio/__snapshots__/latest/en/chrome_huge/validateElement-spec/full_implementation[default].png"
+              },
+              {
+                "description": "sets the input's caret-color back to transparent",
+                "success": "success",
+                "screenshotLink": "/opt/module/tests/wdio/__snapshots__/latest/en/chrome_huge/validateElement-spec/full_implementation[default].png"
+              },
+              {
+                "description": "throws an error for a non-existent element",
+                "success": "success",
+                "screenshotLink": "/opt/module/tests/wdio/__snapshots__/latest/en/chrome_huge/validateElement-spec/full_implementation[default].png"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }

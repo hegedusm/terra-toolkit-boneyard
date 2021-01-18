@@ -29,6 +29,20 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
     });
 
     this.on("runner:start", (runner) => {
+      const filePathLocation1 = path.join(
+        this.resultsDir,
+        `runner_start.json`
+      );
+      fs.writeFileSync(
+        filePathLocation1,
+        `${JSON.stringify(this.runner, null, 2)}`,
+        { flag: "w+" },
+        (err) => {
+          if (err) {
+            Logger.error(err.message, { context: LOG_CONTEXT });
+          }
+        }
+      );
       this.setTestModule(runner.specs[0]);
       this.setResultsDir();
       this.hasResultsDir();
@@ -47,6 +61,20 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
     * @return null
     */
     this.on("suite:start", (params) => {
+      const filePathLocation2 = path.join(
+        this.resultsDir,
+        `suit_start.json`
+      );
+      fs.writeFileSync(
+        filePathLocation2,
+        `${JSON.stringify(this.params, null, 2)}`,
+        { flag: "w+" },
+        (err) => {
+          if (err) {
+            Logger.error(err.message, { context: LOG_CONTEXT });
+          }
+        }
+      );
       const { specHash, title, parent } = params
       let specHashData = this.specHashData
       if (this.moduleName) {
@@ -80,14 +108,56 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
     });
 
     this.on("test:start", (test) => {
+      const filePathLocation3 = path.join(
+        this.resultsDir,
+        `test_start.json`
+      );
+      fs.writeFileSync(
+        filePathLocation3,
+        `${JSON.stringify(this.test, null, 2)}`,
+        { flag: "w+" },
+        (err) => {
+          if (err) {
+            Logger.error(err.message, { context: LOG_CONTEXT });
+          }
+        }
+      );
       this.description = test.title;
     });
 
     this.on("test:pass", (test) => {
+      const filePathLocation4 = path.join(
+        this.resultsDir,
+        `test_pass.json`
+      );
+      fs.writeFileSync(
+        filePathLocation4,
+        `${JSON.stringify(this.test, null, 2)}`,
+        { flag: "w+" },
+        (err) => {
+          if (err) {
+            Logger.error(err.message, { context: LOG_CONTEXT });
+          }
+        }
+      );
       this.success = "success";
     });
 
     this.on("test:fail", (test) => {
+      const filePathLocation5 = path.join(
+        this.resultsDir,
+        `test_fail.json`
+      );
+      fs.writeFileSync(
+        filePathLocation5,
+        `${JSON.stringify(this.test, null, 2)}`,
+        { flag: "w+" },
+        (err) => {
+          if (err) {
+            Logger.error(err.message, { context: LOG_CONTEXT });
+          }
+        }
+      );
       this.success = "fail";
     });
 
@@ -97,6 +167,20 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
     * @return null
     */
     this.on("test:end", (test) => {
+      const filePathLocation6 = path.join(
+        this.resultsDir,
+        `test_end.json`
+      );
+      fs.writeFileSync(
+        filePathLocation6,
+        `${JSON.stringify(this.test, null, 2)}`,
+        { flag: "w+" },
+        (err) => {
+          if (err) {
+            Logger.error(err.message, { context: LOG_CONTEXT });
+          }
+        }
+      );
       const { specHash, parent } = test
       if(this.moduleName) {
         if (this.specHashData[this.moduleName][specHash]) {
@@ -127,7 +211,21 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
     * Format resultJsonObject based on parent and nest the tests
     * @return null
     */
-    this.on("runner:end", () => {
+    this.on("runner:end", (runner) => {
+      const filePathLocation7 = path.join(
+        this.resultsDir,
+        `runner_end.json`
+      );
+      fs.writeFileSync(
+        filePathLocation7,
+        `${JSON.stringify(this.runner, null, 2)}`,
+        { flag: "w+" },
+        (err) => {
+          if (err) {
+            Logger.error(err.message, { context: LOG_CONTEXT });
+          }
+        }
+      );
       const specData = this.moduleName ? this.specHashData[this.moduleName] : this.specHashData
       Object.values(specData).forEach((spec, i) => {
         const revSpecs = Object.values(spec)
