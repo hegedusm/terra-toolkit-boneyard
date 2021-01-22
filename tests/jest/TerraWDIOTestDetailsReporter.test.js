@@ -24,8 +24,8 @@ describe.only('TerraWDIOTestDetailsReporter', () => {
       expect(reporter.resultJsonObject).toHaveProperty('theme');
       expect(reporter.resultJsonObject).toHaveProperty('formFactor');
       expect(reporter.resultJsonObject).toHaveProperty('browser');
-      expect(reporter.resultJsonObject).toHaveProperty('suites');
-      expect(typeof reporter.resultJsonObject.suites).toEqual('object');
+      expect(reporter.resultJsonObject).toHaveProperty('specs');
+      expect(typeof reporter.resultJsonObject.specs).toEqual('object');
     });
 
     it('defines fileName', () => {
@@ -265,9 +265,9 @@ describe.only('TerraWDIOTestDetailsReporter', () => {
          
             reporter.moduleName = "terra-clinical-data-grid";
             reporter.emit('runner:end')
-            expect(reporter.resultJsonObject).toHaveProperty('suites');
+            expect(reporter.resultJsonObject).toHaveProperty('specs');
             expect(typeof reporter.resultJsonObject).toEqual('object')
-            expect(reporter.resultJsonObject.suites[reporter.moduleName].tests.length).toBeGreaterThanOrEqual(1);
+            expect(reporter.resultJsonObject.specs[reporter.moduleName].tests.length).toBeGreaterThanOrEqual(1);
             expect(fs.writeFileSync).toHaveBeenCalled();
 
         })
@@ -294,9 +294,9 @@ describe.only('TerraWDIOTestDetailsReporter', () => {
             }
           }          
           reporter.emit('runner:end')
-          expect(reporter.resultJsonObject).toHaveProperty('suites');
+          expect(reporter.resultJsonObject).toHaveProperty('specs');
           expect(typeof reporter.resultJsonObject).toEqual('object')
-          expect(reporter.resultJsonObject.suites.length).toBeGreaterThanOrEqual(1);
+          expect(reporter.resultJsonObject.specs.length).toBeGreaterThanOrEqual(1);
           expect(fs.writeFileSync).toHaveBeenCalled();
 
       })
