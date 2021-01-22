@@ -23,8 +23,10 @@ describe.only('TerraWDIOTestDetailsReporter', () => {
       expect(reporter.resultJsonObject).toHaveProperty('locale');
       expect(reporter.resultJsonObject).toHaveProperty('theme');
       expect(reporter.resultJsonObject).toHaveProperty('formFactor');
-      expect(reporter.resultJsonObject).toHaveProperty('browser');
+      expect(reporter.resultJsonObject).toHaveProperty('capabilities');
       expect(reporter.resultJsonObject).toHaveProperty('specs');
+      expect(reporter.resultJsonObject.capabilities).toHaveProperty('browser');
+      expect(typeof reporter.resultJsonObject.capabilities).toEqual('object');
       expect(typeof reporter.resultJsonObject.specs).toEqual('object');
     });
 
@@ -78,7 +80,7 @@ describe.only('TerraWDIOTestDetailsReporter', () => {
       expect(reporter.resultJsonObject).toHaveProperty('locale', '');
       expect(reporter.resultJsonObject).toHaveProperty('theme', '');
       expect(reporter.resultJsonObject).toHaveProperty('formFactor', '');
-      expect(reporter.resultJsonObject).toHaveProperty('browser', '');
+      expect(reporter.resultJsonObject.capabilities).toHaveProperty('browser', '');
     });
 
     it('sets file name with locale', () => {
@@ -88,7 +90,7 @@ describe.only('TerraWDIOTestDetailsReporter', () => {
       expect(reporter.resultJsonObject).toHaveProperty('locale', 'en');
       expect(reporter.resultJsonObject).toHaveProperty('theme', '');
       expect(reporter.resultJsonObject).toHaveProperty('formFactor', '');
-      expect(reporter.resultJsonObject).toHaveProperty('browser', '');
+      expect(reporter.resultJsonObject.capabilities).toHaveProperty('browser', '');
     });
 
     it('sets file name with locale and theme', () => {
@@ -98,7 +100,7 @@ describe.only('TerraWDIOTestDetailsReporter', () => {
       expect(reporter.resultJsonObject).toHaveProperty('locale', 'en');
       expect(reporter.resultJsonObject).toHaveProperty('theme', 'default');
       expect(reporter.resultJsonObject).toHaveProperty('formFactor', '');
-      expect(reporter.resultJsonObject).toHaveProperty('browser', '');
+      expect(reporter.resultJsonObject.capabilities).toHaveProperty('browser', '');
     });
 
     it('sets file name with locale, theme and formFactor', () => {
@@ -108,7 +110,7 @@ describe.only('TerraWDIOTestDetailsReporter', () => {
       expect(reporter.resultJsonObject).toHaveProperty('locale', 'en');
       expect(reporter.resultJsonObject).toHaveProperty('theme', 'default');
       expect(reporter.resultJsonObject).toHaveProperty('formFactor', 'tiny');
-      expect(reporter.resultJsonObject).toHaveProperty('browser', '');
+      expect(reporter.resultJsonObject.capabilities).toHaveProperty('browser', '');
     });
 
     it('sets file name with locale, theme, formFactor and browser', () => {
@@ -118,7 +120,7 @@ describe.only('TerraWDIOTestDetailsReporter', () => {
       expect(reporter.resultJsonObject).toHaveProperty('locale', 'en');
       expect(reporter.resultJsonObject).toHaveProperty('theme', 'default');
       expect(reporter.resultJsonObject).toHaveProperty('formFactor', 'tiny');
-      expect(reporter.resultJsonObject).toHaveProperty('browser', 'chrome');
+      expect(reporter.resultJsonObject.capabilities).toHaveProperty('browser', 'chrome');
     });
   });
 
@@ -200,7 +202,7 @@ describe.only('TerraWDIOTestDetailsReporter', () => {
             reporter.setResultsDir();
             reporter.hasResultsDir();
             expect(reporter.resultJsonObject.locale ).toEqual('fr')
-            expect(reporter.resultJsonObject.browser ).toEqual('chrome')
+            expect(reporter.resultJsonObject.capabilities.browser ).toEqual('chrome')
             expect(reporter.resultJsonObject.formFactor ).toEqual('huge')
             expect(reporter.resultJsonObject.theme ).toEqual('default-theme')
             reporter.fileNameCheck(runner.config, runner.capabilities);

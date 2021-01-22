@@ -10,7 +10,9 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
       locale: "",
       theme: "",
       formFactor: "",
-      browser: "",
+      capabilities: {
+        browser: ""
+      },
       specs: {},
     };
     this.moduleName = ''
@@ -33,7 +35,7 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
       this.setResultsDir();
       this.hasResultsDir();
       this.resultJsonObject.locale = runner.config.locale;
-      this.resultJsonObject.browser = runner.config.browserName;
+      this.resultJsonObject.capabilities.browser = runner.config.browserName;
       this.resultJsonObject.formFactor = runner.config.formFactor;
       this.resultJsonObject.theme =
         runner.capabilities.theme || "default-theme";
@@ -243,7 +245,7 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
 
     if (browserName) {
       fileNameConf.push(browserName);
-      this.resultJsonObject.browser = browserName;
+      this.resultJsonObject.capabilities.browser = browserName;
     }
 
     this.fileName = fileNameConf.join("-");
