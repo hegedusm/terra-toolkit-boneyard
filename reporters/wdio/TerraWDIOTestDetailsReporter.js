@@ -11,7 +11,7 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
       theme: "",
       formFactor: "",
       capabilities: {
-        browser: ""
+        browserName: ""
       },
       specs: {},
     };
@@ -19,7 +19,7 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
     this.setResultsDir.bind(this);
     this.hasResultsDir.bind(this);
     this.setTestModule = this.setTestModule.bind(this);
-    this.description = "";
+    this.title = "";
     this.state = "";
     this.error = {};
     this.screenshotLink = "";
@@ -36,7 +36,7 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
       this.setResultsDir();
       this.hasResultsDir();
       this.resultJsonObject.locale = runner.config.locale;
-      this.resultJsonObject.capabilities.browser = runner.config.browserName;
+      this.resultJsonObject.capabilities.browserName = runner.config.browserName;
       this.resultJsonObject.formFactor = runner.config.formFactor;
       this.resultJsonObject.theme =
         runner.capabilities.theme || "default-theme";
@@ -64,7 +64,7 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
         if (!specHashData[this.moduleName][specHash][title]) {
           specHashData[this.moduleName][specHash][title] = {
             parent,
-            description: title,
+            title: title,
             tests: []
           }
         }
@@ -75,7 +75,7 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
         if (!specHashData[specHash][title]) {
           specHashData[specHash][title] = {
             parent,
-            description: title,
+            title: title,
             tests: []
           }
         }
@@ -83,7 +83,7 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
     });
 
     this.on("test:start", (test) => {
-      this.description = test.title;
+      this.title = test.title;
     });
 
     this.on("test:pass", (test) => {
@@ -111,7 +111,7 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
         if (this.specHashData[this.moduleName][specHash]) {
           if (this.specHashData[this.moduleName][specHash][parent]) {
             this.specHashData[this.moduleName][specHash][parent].tests.push({
-              description: this.description,
+              title: this.title,
               state: this.state,
               screenshotLink: this.screenshotLink.screenshotPath,
             })
@@ -127,7 +127,7 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
         if (this.specHashData[specHash]) {
           if (this.specHashData[specHash][parent]) {
             this.specHashData[specHash][parent].tests.push({
-              description: this.description,
+              title: this.title,
               state: this.state,
               screenshotLink: this.screenshotLink.screenshotPath,
             })
@@ -151,13 +151,13 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
       Object.values(specData).forEach((spec, i) => {
         const revSpecs = Object.values(spec)
         revSpecs.forEach((test) => {
-          if (test.parent !== test.description) {
-            const parentIndex = revSpecs.findIndex(item => item.description === test.parent)
+          if (test.parent !== test.title) {
+            const parentIndex = revSpecs.findIndex(item => item.title === test.parent)
             if (parentIndex > -1) {
-              if(!revSpecs[parentIndex].suits) {
-                revSpecs[parentIndex].suits = []
+              if(!revSpecs[parentIndex].suites) {
+                revSpecs[parentIndex].suites = []
               }
-            revSpecs[parentIndex].suits.push(test);
+            revSpecs[parentIndex].suites.push(test);
             delete test.parent;
           }
           }
@@ -262,7 +262,7 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
 
     if (browserName) {
       fileNameConf.push(browserName);
-      this.resultJsonObject.capabilities.browser = browserName;
+      this.resultJsonObject.capabilities.browserName = browserName;
     }
 
     this.fileName = fileNameConf.join("-");

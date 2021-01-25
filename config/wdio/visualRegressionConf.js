@@ -1,9 +1,6 @@
 const path = require('path');
 const { LocalCompare } = require('wdio-visual-regression-service/compare');
 const { terraViewports: VIEWPORTS } = require('./services.default-config');
-const TerraWDIOTestDetailsReporter = require('../../reporters/wdio/TerraWDIOTestDetailsReporter');
-
-const em = new TerraWDIOTestDetailsReporter();
 
 const screenshotSetup = {
   diffDir: 'diff',

@@ -20,17 +20,4 @@ Terra.describeViewports('validateElement', ['tiny', 'small', 'huge'], () => {
       Terra.validates.element({ axeRules: ignoredA11y });
     });
   });
-
-  describe('full implementation', () => {
-    before(() => {
-      browser.url('/compare.html');
-    });
-
-    Terra.it.validatesElement();
-
-    it('checks element', () => {
-      Terra.validates.element();
-    });
-  });
 });
- 
