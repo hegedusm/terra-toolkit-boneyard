@@ -47,7 +47,6 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
     /**
     * Format class member specHashData with runner's specHash. If its monorepo formatting the specHash inside the moduleName
     * @param {Object} params
-    * @return null
     */
     this.on("suite:start", (params) => {
       const { specHash, title, parent } = params

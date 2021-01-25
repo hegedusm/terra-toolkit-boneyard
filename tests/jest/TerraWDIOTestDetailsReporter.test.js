@@ -25,7 +25,7 @@ describe.only('TerraWDIOTestDetailsReporter', () => {
       expect(reporter.resultJsonObject).toHaveProperty('formFactor');
       expect(reporter.resultJsonObject).toHaveProperty('capabilities');
       expect(reporter.resultJsonObject).toHaveProperty('specs');
-      expect(reporter.resultJsonObject.capabilities).toHaveProperty('browser');
+      expect(reporter.resultJsonObject.capabilities).toHaveProperty('browserName');
       expect(typeof reporter.resultJsonObject.capabilities).toEqual('object');
       expect(typeof reporter.resultJsonObject.specs).toEqual('object');
     });
@@ -80,7 +80,7 @@ describe.only('TerraWDIOTestDetailsReporter', () => {
       expect(reporter.resultJsonObject).toHaveProperty('locale', '');
       expect(reporter.resultJsonObject).toHaveProperty('theme', '');
       expect(reporter.resultJsonObject).toHaveProperty('formFactor', '');
-      expect(reporter.resultJsonObject.capabilities).toHaveProperty('browser', '');
+      expect(reporter.resultJsonObject.capabilities).toHaveProperty('browserName', '');
     });
 
     it('sets file name with locale', () => {
@@ -90,7 +90,7 @@ describe.only('TerraWDIOTestDetailsReporter', () => {
       expect(reporter.resultJsonObject).toHaveProperty('locale', 'en');
       expect(reporter.resultJsonObject).toHaveProperty('theme', '');
       expect(reporter.resultJsonObject).toHaveProperty('formFactor', '');
-      expect(reporter.resultJsonObject.capabilities).toHaveProperty('browser', '');
+      expect(reporter.resultJsonObject.capabilities).toHaveProperty('browserName', '');
     });
 
     it('sets file name with locale and theme', () => {
@@ -100,7 +100,7 @@ describe.only('TerraWDIOTestDetailsReporter', () => {
       expect(reporter.resultJsonObject).toHaveProperty('locale', 'en');
       expect(reporter.resultJsonObject).toHaveProperty('theme', 'default');
       expect(reporter.resultJsonObject).toHaveProperty('formFactor', '');
-      expect(reporter.resultJsonObject.capabilities).toHaveProperty('browser', '');
+      expect(reporter.resultJsonObject.capabilities).toHaveProperty('browserName', '');
     });
 
     it('sets file name with locale, theme and formFactor', () => {
@@ -110,17 +110,17 @@ describe.only('TerraWDIOTestDetailsReporter', () => {
       expect(reporter.resultJsonObject).toHaveProperty('locale', 'en');
       expect(reporter.resultJsonObject).toHaveProperty('theme', 'default');
       expect(reporter.resultJsonObject).toHaveProperty('formFactor', 'tiny');
-      expect(reporter.resultJsonObject.capabilities).toHaveProperty('browser', '');
+      expect(reporter.resultJsonObject.capabilities).toHaveProperty('browserName', '');
     });
 
-    it('sets file name with locale, theme, formFactor and browser', () => {
+    it('sets file name with locale, theme, formFactor and browserName', () => {
       const reporter = new TerraWDIOTestDetailsReporter({}, {});
       reporter.fileNameCheck({ locale: 'en', theme: 'default', formFactor: 'tiny' }, {browserName: 'chrome'});
       expect(reporter.fileName).toEqual('result-details-en-default-tiny-chrome');
       expect(reporter.resultJsonObject).toHaveProperty('locale', 'en');
       expect(reporter.resultJsonObject).toHaveProperty('theme', 'default');
       expect(reporter.resultJsonObject).toHaveProperty('formFactor', 'tiny');
-      expect(reporter.resultJsonObject.capabilities).toHaveProperty('browser', 'chrome');
+      expect(reporter.resultJsonObject.capabilities).toHaveProperty('browserName', 'chrome');
     });
   });
 
@@ -141,24 +141,24 @@ describe.only('TerraWDIOTestDetailsReporter', () => {
   });
 
   describe('test:start', () => {
-      it('test:start description should set ', () => {
+      it('test:start title should set ', () => {
         const reporter = new TerraWDIOTestDetailsReporter({}, {});
        reporter.emit('test:start', {title: 'title of the it'})
-        expect(reporter.description).toEqual('title of the it')
+        expect(reporter.title).toEqual('title of the it')
     })
 })
-    describe('reaches test:pass or test:fail', () => {
-        it('test:pass description should set ', () => {
-            const reporter = new TerraWDIOTestDetailsReporter({}, {});
-            reporter.emit('test:pass', {success: 'success'})
-            expect(reporter.success).toEqual('success')
-        })
-        it('test:fail description should set ', () => {
-            const reporter = new TerraWDIOTestDetailsReporter({}, {});
-            reporter.emit('test:fail', {success: 'fail'})
-            expect(reporter.success).toEqual('fail')
-        })
-    })
+    // describe('reaches test:pass or test:fail', () => {
+    //     it('test:pass description should set ', () => {
+    //         const reporter = new TerraWDIOTestDetailsReporter({}, {});
+    //         reporter.emit('test:pass', {state: 'success'})
+    //         expect(reporter.state).toEqual('success')
+    //     })
+    //     it('test:fail description should set ', () => {
+    //         const reporter = new TerraWDIOTestDetailsReporter({}, {});
+    //         reporter.emit('test:fail', {state: 'fail'})
+    //         expect(reporter.state).toEqual('fail')
+    //     })
+    // })
 
     describe('terra-wdio:latest-screenshot', () => {
         it('terra-wdio:latest-screenshotshould set screenshotLink', () => {
@@ -202,7 +202,7 @@ describe.only('TerraWDIOTestDetailsReporter', () => {
             reporter.setResultsDir();
             reporter.hasResultsDir();
             expect(reporter.resultJsonObject.locale ).toEqual('fr')
-            expect(reporter.resultJsonObject.capabilities.browser ).toEqual('chrome')
+            expect(reporter.resultJsonObject.capabilities.browserName ).toEqual('chrome')
             expect(reporter.resultJsonObject.formFactor ).toEqual('huge')
             expect(reporter.resultJsonObject.theme ).toEqual('default-theme')
             reporter.fileNameCheck(runner.config, runner.capabilities);
@@ -220,7 +220,7 @@ describe.only('TerraWDIOTestDetailsReporter', () => {
             reporter.emit('suite:start', params)
             expect(reporter.specHashData).toHaveProperty(reporter.moduleName);
             expect(reporter.specHashData[reporter.moduleName][params.specHash][params.title]).toHaveProperty('parent');
-            expect(reporter.specHashData[reporter.moduleName][params.specHash][params.title]).toHaveProperty('description');
+            expect(reporter.specHashData[reporter.moduleName][params.specHash][params.title]).toHaveProperty('title');
             expect(reporter.specHashData[reporter.moduleName][params.specHash][params.title]).toHaveProperty('tests');
             expect(typeof reporter.specHashData[reporter.moduleName][params.specHash][params.title].tests).toEqual('object')
 
@@ -235,7 +235,7 @@ describe.only('TerraWDIOTestDetailsReporter', () => {
           reporter.emit('suite:start', params)
           expect(reporter.specHashData).not.toHaveProperty(reporter.moduleName);
           expect(reporter.specHashData[params.specHash][params.title]).toHaveProperty('parent');
-          expect(reporter.specHashData[params.specHash][params.title]).toHaveProperty('description');
+          expect(reporter.specHashData[params.specHash][params.title]).toHaveProperty('title');
           expect(reporter.specHashData[params.specHash][params.title]).toHaveProperty('tests');
           expect(typeof reporter.specHashData[params.specHash][params.title].tests).toEqual('object')
 
@@ -248,15 +248,15 @@ describe.only('TerraWDIOTestDetailsReporter', () => {
             { f75728c9953420794e669cae74b03d58:
               { hideInputCaret:
                  { parent: 'hideInputCaret',
-                   description: 'hideInputCaret',
+                   title: 'hideInputCaret',
                    tests: [
                     {
-                      "description": "Express correctly sets the application locale",
-                      "success": "success"
+                      "title": "Express correctly sets the application locale",
+                      "state": "success"
                     },
                     {
-                      "description": "[default] to be within the mismatch tolerance",
-                      "success": "success",
+                      "title": "[default] to be within the mismatch tolerance",
+                      "state": "success",
                       "screenshotLink": "/opt/module/tests/wdio/__snapshots__/latest/fr/chrome_huge/i18n-spec/I18n_Locale[default].png"
                     }
                    ] 
@@ -279,16 +279,16 @@ describe.only('TerraWDIOTestDetailsReporter', () => {
             "f75728c9953420794e669cae74b03d58": {
               "hideInputCaret": {
                 "parent": "hideInputCaret",
-                "description": "hideInputCaret",
+                "title": "hideInputCaret",
                 "tests": []
               },
               "group1": {
                 "parent": "hideInputCaret",
-                "description": "group1",
+                "title": "group1",
                 "tests": [
                   {
-                    "description": "validates the textarea's caret-color is inherited as transparent",
-                    "success": "success",
+                    "title": "validates the textarea's caret-color is inherited as transparent",
+                    "state": "success",
                     "screenshotLink": "/opt/module/tests/wdio/__snapshots__/latest/en/chrome_tiny/validateElement-spec/full_implementation[default].png"
                   }
                 ]
