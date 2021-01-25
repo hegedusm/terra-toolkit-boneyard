@@ -20,7 +20,8 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
     this.hasResultsDir.bind(this);
     this.setTestModule = this.setTestModule.bind(this);
     this.description = "";
-    this.success = "";
+    this.state = "";
+    this.error = {};
     this.screenshotLink = "";
     this.specHashData = {};
     this.nonMonoRepoResult = [];
@@ -86,11 +87,17 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
     });
 
     this.on("test:pass", (test) => {
-      this.success = "success";
+      this.state = "success";
     });
 
     this.on("test:fail", (test) => {
-      this.success = "fail";
+      this.error = {
+        name: "Error",
+        message: test.err.message,
+        stack: test.err.stack,
+        type: test.err.type
+      }
+      this.state = "fail";
     });
 
     /**
@@ -105,9 +112,14 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
           if (this.specHashData[this.moduleName][specHash][parent]) {
             this.specHashData[this.moduleName][specHash][parent].tests.push({
               description: this.description,
-              success: this.success,
+              state: this.state,
               screenshotLink: this.screenshotLink.screenshotPath,
             })
+            if(this.state === 'fail') {
+              this.specHashData[this.moduleName][specHash][parent].tests.push({
+                error: this.error,
+              })
+            }
           }
         }
       }
@@ -116,9 +128,14 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
           if (this.specHashData[specHash][parent]) {
             this.specHashData[specHash][parent].tests.push({
               description: this.description,
-              success: this.success,
+              state: this.state,
               screenshotLink: this.screenshotLink.screenshotPath,
             })
+            if(this.state === 'fail') {
+              this.specHashData[specHash][parent].tests.push({
+                error: this.error,
+              })
+            }
           }
         }
       }
