@@ -44,4 +44,4 @@ screenshotName: (context) => {
 - The name of the log file for mono-repo will be **result-details-\<locale>-\<theme>-\<form-factor>-\<browser>-<Package-name>.json**(eg: result-details-clinical-lowlight-theme-chrome-terra-clinical-data-grid.json)
 
 - Example output  [a relative link](details-reporter-sample-results.json)
-s
+- Example output for mono repo [a relative link](details-reporter-mono-repo-sample-results.json)

@@ -1,0 +1,136 @@
+{
+  "theme": "clinical-lowlight-theme",
+  "capabilities": {
+    "browser": "chrome"
+  },
+  "specs": {
+    "terra-clinical-data-grid": {
+      "description": "[medium]",
+      "tests": [],
+      "suits": [
+        {
+          "description": "DataGrid",
+          "tests": [],
+          "suits": [
+            {
+              "description": "with pinned columns and overflow columns",
+              "tests": [],
+              "suits": [
+                {
+                  "description": "with initial rendering",
+                  "tests": [
+                    {
+                      "description": "validates the input's caret-color is inherited as transparent",
+                      "success": "success",
+                      "screenshotLink": "/opt/module/tests/wdio/__snapshots__/latest/en/chrome_huge/validateElement-spec/full_implementation[default].png"
+                    },
+                    {
+                      "description": "sets the input's caret-color to orange",
+                      "success": "success",
+                      "screenshotLink": "/opt/module/tests/wdio/__snapshots__/latest/en/chrome_huge/validateElement-spec/full_implementation[default].png"
+                    }
+                  ]
+                },
+                {
+                  "description": "with horizontal overflow",
+                  "tests": []
+                },
+                {
+                  "description": "with vertical overflow",
+                  "tests": []
+                }
+              ]
+            },
+            {
+              "description": "with fill disabled",
+              "tests": []
+            },
+            {
+              "description": "with no pinned columns",
+              "tests": []
+            },
+            {
+              "description": "with no oveflow columns",
+              "tests": []
+            },
+            {
+              "description": "with tabbing",
+              "tests": [
+                {
+                  "description": "validates the input's caret-color is inherited as transparent",
+                  "success": "success",
+                  "screenshotLink": "/opt/module/tests/wdio/__snapshots__/latest/en/chrome_huge/validateElement-spec/full_implementation[default].png"
+                },
+                {
+                  "description": "sets the input's caret-color to orange",
+                  "success": "success",
+                  "screenshotLink": "/opt/module/tests/wdio/__snapshots__/latest/en/chrome_huge/validateElement-spec/full_implementation[default].png"
+                }
+              ]
+            },
+            {
+              "description": "with cell selections",
+              "tests": []
+            },
+            {
+              "description": "with row selections",
+              "tests": []
+            },
+            {
+              "description": "with column header selections",
+              "tests": []
+            },
+            {
+              "description": "with subsection selections",
+              "tests": []
+            },
+            {
+              "description": "with paging",
+              "tests": []
+            },
+            {
+              "description": "with custom row/header heights",
+              "tests": [
+                {
+                  "description": "validates the input's caret-color is inherited as transparent",
+                  "success": "success",
+                  "screenshotLink": "/opt/module/tests/wdio/__snapshots__/latest/en/chrome_huge/validateElement-spec/full_implementation[default].png"
+                },
+                {
+                  "description": "sets the input's caret-color to orange",
+                  "success": "success",
+                  "screenshotLink": "/opt/module/tests/wdio/__snapshots__/latest/en/chrome_huge/validateElement-spec/full_implementation[default].png"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "description": "[huge]",
+          "tests": []
+        }
+      ]
+    },
+    "terra-clinical-result": {
+      "description": "[medium]",
+      "tests": [],
+      "suits": [
+        {
+          "description": "ResultTimeHeaderCell",
+          "tests": [
+            {
+              "description": "validates the input's caret-color is inherited as transparent",
+              "success": "success",
+              "screenshotLink": "/opt/module/tests/wdio/__snapshots__/latest/en/chrome_huge/validateElement-spec/full_implementation[default].png"
+            },
+            {
+              "description": "sets the input's caret-color to orange",
+              "success": "success",
+              "screenshotLink": "/opt/module/tests/wdio/__snapshots__/latest/en/chrome_huge/validateElement-spec/full_implementation[default].png"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
