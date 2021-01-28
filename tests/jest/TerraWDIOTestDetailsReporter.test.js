@@ -40,16 +40,16 @@ describe.only('TerraWDIOTestDetailsReporter', () => {
         fs.existsSync.mockReturnValue(true);
         let reporter = new TerraWDIOTestDetailsReporter({}, {});
         reporter.setResultsDir()
-        expect(reporter.resultsDir).toEqual(expect.stringContaining('test/wdio/reports/details'));
+        expect(reporter.resultsDir).toEqual(expect.stringContaining('test/wdio/reports'));
 
         fs.existsSync.mockReturnValue(false);
         reporter = new TerraWDIOTestDetailsReporter({}, {});
         reporter.setResultsDir()
-        expect(reporter.resultsDir).toEqual(expect.stringContaining('tests/wdio/reports/details'));
+        expect(reporter.resultsDir).toEqual(expect.stringContaining('test'));
       });
 
       it('when outputDir is defined in configuration', () => {
-        const reporter = new TerraWDIOTestDetailsReporter({}, { reporterOptions: { detailsReporter: 'my-test-reports/wdio' } });
+        const reporter = new TerraWDIOTestDetailsReporter({}, { reporterOptions: { outputDir: 'my-test-reports/wdio' } });
         reporter.setResultsDir()
         expect(reporter.resultsDir).toEqual('my-test-reports/wdio');
       });
@@ -147,24 +147,29 @@ describe.only('TerraWDIOTestDetailsReporter', () => {
         expect(reporter.title).toEqual('title of the it')
     })
 })
-    // describe('reaches test:pass or test:fail', () => {
-    //     it('test:pass description should set ', () => {
-    //         const reporter = new TerraWDIOTestDetailsReporter({}, {});
-    //         reporter.emit('test:pass', {state: 'success'})
-    //         expect(reporter.state).toEqual('success')
-    //     })
-    //     it('test:fail description should set ', () => {
-    //         const reporter = new TerraWDIOTestDetailsReporter({}, {});
-    //         reporter.emit('test:fail', {state: 'fail'})
-    //         expect(reporter.state).toEqual('fail')
-    //     })
-    // })
+    describe('reaches test:pass or test:fail', () => {
+        it('test:pass description should set ', () => {
+            const reporter = new TerraWDIOTestDetailsReporter({}, {});
+            reporter.emit('test:pass', {state: 'success'})
+            expect(reporter.state).toEqual('success')
+        })
+        it('test:fail description should set ', () => {
+            const reporter = new TerraWDIOTestDetailsReporter({}, {});
+            const err = {
+              message: "expected to be within the mismatch tolerance, but received the following comparison results \n{\n  \"isSameDimensions\": false,\n  \"misMatchPercentage\": 2.9\n}",
+              stack: "AssertionError: expected to be within the mismatch tolerance, but received the following comparison results \n{\n  \"isSameDimensions\": false,\n  \"misMatchPercentage\": 2.9\n}\n    at Object.runMatchScreenshotTest (/opt/module/lib/wdio/services/TerraCommands/visual-regression.js:39:33)\n    at Object.validatesElement [as element] (/opt/module/lib/wdio/services/TerraCommands/validate-element.js:50:29)\n    at Context.it (/opt/module/tests/wdio/validateElement-spec.js:20:23)\n    at new Promise (<anonymous>)\n    at new F (/opt/module/node_modules/babel-runtime/node_modules/core-js/library/modules/_export.js:36:28)",
+              type: "AssertionError"
+            };
+            reporter.emit('test:fail', {state: 'fail', err})
+            expect(reporter.state).toEqual('fail')
+        })
+    })
 
     describe('terra-wdio:latest-screenshot', () => {
         it('terra-wdio:latest-screenshotshould set screenshotLink', () => {
             const reporter = new TerraWDIOTestDetailsReporter({}, {});
-            reporter.emit('terra-wdio:latest-screenshot', {screenshotLink: 'opt/Image.png'})
-            expect(reporter.screenshotLink).toEqual({"screenshotLink": "opt/Image.png"})
+            reporter.emit('terra-wdio:latest-screenshot', {screenshotPath: 'opt/Image.png'})
+            expect(reporter.screenshots[0]).toEqual("opt/Image.png")
         })
     })
     describe('runner:start', () => {
@@ -266,7 +271,16 @@ describe.only('TerraWDIOTestDetailsReporter', () => {
             }
          
             reporter.moduleName = "terra-clinical-data-grid";
-            reporter.emit('runner:end')
+            const runner = 
+              { 
+                event: 'runner:end',
+                failures: 0,
+                cid: '0-2',
+                specs: [ '/opt/module/tests/wdio/hideInputCaret-spec.js' ],
+                specHash: 'f75728c9953420794e669cae74b03d58' 
+              }
+
+            reporter.emit('runner:end', runner);
             expect(reporter.resultJsonObject).toHaveProperty('specs');
             expect(typeof reporter.resultJsonObject).toEqual('object')
             expect(reporter.resultJsonObject.specs[reporter.moduleName].tests.length).toBeGreaterThanOrEqual(1);
@@ -294,8 +308,16 @@ describe.only('TerraWDIOTestDetailsReporter', () => {
                 ]
               }
             }
-          }          
-          reporter.emit('runner:end')
+          }
+          const runner = 
+              { 
+                event: 'runner:end',
+                failures: 0,
+                cid: '0-2',
+                specs: [ '/opt/module/tests/wdio/hideInputCaret-spec.js' ],
+                specHash: 'f75728c9953420794e669cae74b03d58' 
+              }       
+          reporter.emit('runner:end', runner);
           expect(reporter.resultJsonObject).toHaveProperty('specs');
           expect(typeof reporter.resultJsonObject).toEqual('object')
           expect(reporter.resultJsonObject.specs.length).toBeGreaterThanOrEqual(1);

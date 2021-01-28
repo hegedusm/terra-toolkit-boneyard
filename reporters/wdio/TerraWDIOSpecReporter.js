@@ -47,14 +47,14 @@ class TerraWDIOSpecReporter extends WDIOSpecReporter {
   }
 
   /**
-   * Sets results directory for the test run. Uses the wdio reporterOptions.specReporterOutputDir if set, otherwise
+   * Sets results directory for the test run. Uses the wdio reporterOptions.outputDir if set, otherwise
    * it outputs to tests?/wdio/reports.
    * @return null;
    */
   setResultsDir() {
     const { reporterOptions } = this.options;
-    if (reporterOptions && reporterOptions.specReporterOutputDir) {
-      this.resultsDir = reporterOptions.specReporterOutputDir;
+    if (reporterOptions && reporterOptions.outputDir) {
+      this.resultsDir = reporterOptions.outputDir;
     } else {
       let testDir = 'tests';
       if (fs.existsSync(path.join(process.cwd(), 'test'))) {

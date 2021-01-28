@@ -11,24 +11,24 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
       theme: "",
       formFactor: "",
       capabilities: {
-        browserName: ""
+        browserName: "",
       },
       specs: {},
     };
-    this.moduleName = ''
+    this.moduleName = "";
     this.setResultsDir.bind(this);
     this.hasResultsDir.bind(this);
     this.setTestModule = this.setTestModule.bind(this);
     this.title = "";
     this.state = "";
     this.error = {};
-    this.screenshotLink = "";
+    this.screenshots = [];
     this.specHashData = {};
     this.nonMonoRepoResult = [];
     this.resultsDir = "";
 
     this.on("terra-wdio:latest-screenshot", (screenshotPath) => {
-      this.screenshotLink = screenshotPath;
+      this.screenshots.push(screenshotPath.screenshotPath);
     });
 
     this.on("runner:start", (runner) => {
@@ -41,42 +41,40 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
       this.resultJsonObject.theme =
         runner.capabilities.theme || "default-theme";
       this.fileNameCheck(runner.config, runner.capabilities);
-
     });
 
     /**
-    * Format class member specHashData with runner's specHash. If its monorepo formatting the specHash inside the moduleName
-    * @param {Object} params
-    */
+     * Format class member specHashData with runner's specHash. If its monorepo formatting the specHash inside the moduleName
+     * @param {Object} params
+     */
     this.on("suite:start", (params) => {
-      const { specHash, title, parent } = params
-      let specHashData = this.specHashData
+      const { specHash, title, parent } = params;
+      let specHashData = this.specHashData;
       if (this.moduleName) {
         if (!this.specHashData[this.moduleName]) {
-          this.specHashData[this.moduleName] = {}
-          specHashData = this.specHashData
+          this.specHashData[this.moduleName] = {};
+          specHashData = this.specHashData;
         }
         if (!specHashData[this.moduleName][specHash]) {
-          specHashData[this.moduleName][specHash] = {}
+          specHashData[this.moduleName][specHash] = {};
         }
-  
         if (!specHashData[this.moduleName][specHash][title]) {
           specHashData[this.moduleName][specHash][title] = {
             parent,
             title: title,
             tests: []
-          }
+          };
         }
       } else {
         if (!specHashData[specHash]) {
-          specHashData[specHash] = {}
+          specHashData[specHash] = {};
         }
         if (!specHashData[specHash][title]) {
           specHashData[specHash][title] = {
             parent,
             title: title,
             tests: []
-          }
+          };
         }
       }
     });
@@ -95,80 +93,101 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
         message: test.err.message,
         stack: test.err.stack,
         type: test.err.type
-      }
+      };
       this.state = "fail";
     });
 
     /**
-    * update specHashData with description, success, screenshotLink 
-    * @param {Object} test 
-    * @return null
-    */
+     * update specHashData with description, success, screenshots
+     * @param {Object} test
+     * @return null
+     */
     this.on("test:end", (test) => {
-      const { specHash, parent } = test
-      if(this.moduleName) {
+      const { specHash, parent } = test;
+      if (this.moduleName) {
         if (this.specHashData[this.moduleName][specHash]) {
           if (this.specHashData[this.moduleName][specHash][parent]) {
             this.specHashData[this.moduleName][specHash][parent].tests.push({
               title: this.title,
               state: this.state,
-              screenshotLink: this.screenshotLink.screenshotPath,
-            })
-            if(this.state === 'fail') {
+              screenshots: this.screenshots,
+            });
+            if (this.state === "fail") {
               this.specHashData[this.moduleName][specHash][parent].tests.push({
                 error: this.error,
-              })
+              });
             }
           }
         }
-      }
-      else {
+      } else {
         if (this.specHashData[specHash]) {
           if (this.specHashData[specHash][parent]) {
             this.specHashData[specHash][parent].tests.push({
               title: this.title,
               state: this.state,
-              screenshotLink: this.screenshotLink.screenshotPath,
-            })
-            if(this.state === 'fail') {
+              screenshots: this.screenshots,
+            });
+            if (this.state === "fail") {
               this.specHashData[specHash][parent].tests.push({
                 error: this.error,
-              })
+              });
             }
           }
         }
       }
-      
     });
 
     /**
-    * Format resultJsonObject based on parent and nest the tests
-    * @return null
-    */
+     * Format resultJsonObject based on parent and nest the tests
+     * @return null
+     */
     this.on("runner:end", (runner) => {
-      const specData = this.moduleName ? this.specHashData[this.moduleName] : this.specHashData
-      Object.values(specData).forEach((spec, i) => {
-        const revSpecs = Object.values(spec)
-        revSpecs.forEach((test) => {
-          if (test.parent !== test.title) {
-            const parentIndex = revSpecs.findIndex(item => item.title === test.parent)
-            if (parentIndex > -1) {
-              if(!revSpecs[parentIndex].suites) {
-                revSpecs[parentIndex].suites = []
-              }
-            revSpecs[parentIndex].suites.push(test);
-            delete test.parent;
+      const specData = this.moduleName ? this.specHashData[this.moduleName] : this.specHashData;
+      Object.values(specData).forEach((spec) => {
+        const revSpecs = Object.values(spec);
+        revSpecs.forEach((test, i) => {
+          if (test.parent === test.title) {
+            const {title, parent, ...rest} = revSpecs[i]
+            revSpecs[i] = {
+              title,
+              spec: runner.specs[0],
+              ...rest
+            }
           }
+          if (test.parent !== test.title) {
+            const parentIndex = revSpecs.findIndex(
+              (item) => item.title === test.parent
+            );
+
+            if (parentIndex > -1) {
+              if (!revSpecs[parentIndex].suites) {
+                revSpecs[parentIndex].suites = [];
+              }
+              revSpecs[parentIndex].suites.push(test);
+              delete test.parent;
+            }
           }
           delete test.parent;
-        })
+        });
         if (this.moduleName) {
+          const fileName = path.join(
+            this.resultsDir,
+            `${this.moduleName}_${this.fileName}.json`);
           this.resultJsonObject.specs[this.moduleName] = revSpecs.shift();
-        }
-        else {
+          fs.writeFileSync(
+            fileName,
+            `${JSON.stringify(this.resultJsonObject.specs[this.moduleName], null, 2)}`,
+            { flag: "w+" },
+            (err) => {
+              if (err) {
+                Logger.error(err.message, { context: LOG_CONTEXT });
+              }
+            }
+          );
+        } else {
           this.nonMonoRepoResult.push(revSpecs.shift());
         }
-      })
+      });
       if (!this.moduleName) {
         this.resultJsonObject.specs = this.nonMonoRepoResult;
       }
@@ -186,17 +205,18 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
           }
         }
       );
-      this.specHashData = {}
+      this.screenshots = [];
+      this.specHashData = {};
     });
   }
 
   /**
-  * Set the package name to moduleName property if specsValue contains /package string
-  * @param {string} specsValue - File path of current spec file from runners
-  * @return null
-  */
+   * Set the package name to moduleName property if specsValue contains /package string
+   * @param {string} specsValue - File path of current spec file from runners
+   * @return null
+   */
   setTestModule(specsValue) {
-    const index = specsValue.lastIndexOf('packages/');
+    const index = specsValue.lastIndexOf("packages/");
     if (index > -1) {
       const testFilePath = specsValue.substring(index).split(path.sep);
       const moduleName = testFilePath && testFilePath[1] ? testFilePath[1] : process.cwd().split(path.sep).pop();
@@ -221,27 +241,27 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
   }
 
   /**
-   * Sets results directory for the test run. Uses the wdio reporterOptions.detailsReporter if set, otherwise
+   * Sets results directory for the test run. Uses the wdio reporterOptions.outputDir if set, otherwise
    * it outputs to tests?/wdio/reports/details.
    * @return null;
    */
   setResultsDir() {
     const { reporterOptions } = this.options;
-    if (reporterOptions && reporterOptions.detailsReporter) {
-      this.resultsDir = reporterOptions.detailsReporter;
+    if (reporterOptions && reporterOptions.outputDir) {
+      this.resultsDir = reporterOptions.outputDir;
     } else {
-      let testDir = 'tests';
-      if (fs.existsSync(path.join(process.cwd(), 'test'))) {
-        testDir = 'test';
+      let testDir = "tests";
+      if (fs.existsSync(path.join(process.cwd(), "test"))) {
+        testDir = "test";
       }
-      this.resultsDir = path.join(process.cwd(), testDir, 'wdio', 'reports', 'details');
+      this.resultsDir = path.join(process.cwd(), testDir, "wdio", "reports");
     }
   }
 
   /**
-  * Formatting the filename based on locale, theme, and formFactor
-  * @return null
-  */
+   * Formatting the filename based on locale, theme, and formFactor
+   * @return null
+   */
   fileNameCheck({ formFactor, locale, theme }, { browserName }) {
     const fileNameConf = ["result-details"];
     if (locale) {

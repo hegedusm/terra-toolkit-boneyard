@@ -117,8 +117,7 @@ const config = {
     bail,
   },
   reporterOptions: {
-    specReporterOutputDir: path.resolve(process.cwd(), 'tests', 'wdio', 'reports'),
-    detailsReporter: path.resolve(process.cwd(), 'tests', 'wdio', 'reports','details')
+    outputDir: path.resolve(process.cwd(), 'tests', 'wdio', 'reports'),
   },
   reporters: ['dot', TerraWDIOSpecReporter, TerraWDIOTestDetailsReporter],
   ...theme && { theme },
