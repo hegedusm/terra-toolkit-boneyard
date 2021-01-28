@@ -2,8 +2,14 @@
 
 ## Unreleased
 
+* Updated
+  * Updated wdio.conf to dynamically update `IP`, when VPN is connected.
+
 * Changed
   * Updated browserslist-config-terra to @cerner/browserslist-config-terra
+
+* Fixed
+  * Fulfil missing peer dependencies.
 
 ## 6.12.0 - (November 3, 2020)
 
