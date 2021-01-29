@@ -35,7 +35,6 @@ class TerraWDIOSpecReporter extends WDIOSpecReporter {
     this.on('runner:end', (runner) => {
       this.runners.push(runner);
     });
-    
   }
 
   /**
