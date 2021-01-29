@@ -40,7 +40,7 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
       this.resultJsonObject.formFactor = runner.config.formFactor;
       this.resultJsonObject.theme =
         runner.capabilities.theme || "default-theme";
-      this.fileNameCheck(runner.config, runner.capabilities);
+      this.fileNameCheck(runner.config, runner.capabilities, this.moduleName);
     });
 
     /**
@@ -107,14 +107,19 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
       if (this.moduleName) {
         if (this.specHashData[this.moduleName][specHash]) {
           if (this.specHashData[this.moduleName][specHash][parent]) {
-            this.specHashData[this.moduleName][specHash][parent].tests.push({
-              title: this.title,
-              state: this.state,
-              screenshots: this.screenshots,
-            });
-            if (this.state === "fail") {
+            if(this.state !== "fail"){
               this.specHashData[this.moduleName][specHash][parent].tests.push({
-                error: this.error,
+                title: this.title,
+                state: this.state,
+                screenshots: this.screenshots,
+              });
+            }
+            else{
+              this.specHashData[this.moduleName][specHash][parent].tests.push({
+                title: this.title,
+                state: this.state,
+                screenshots: this.screenshots,
+                error: this.error
               });
             }
           }
@@ -122,14 +127,19 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
       } else {
         if (this.specHashData[specHash]) {
           if (this.specHashData[specHash][parent]) {
-            this.specHashData[specHash][parent].tests.push({
-              title: this.title,
-              state: this.state,
-              screenshots: this.screenshots,
-            });
-            if (this.state === "fail") {
+            if(this.state !== "fail" ) {
               this.specHashData[specHash][parent].tests.push({
-                error: this.error,
+                title: this.title,
+                state: this.state,
+                screenshots: this.screenshots,
+              });
+            }
+            else {
+              this.specHashData[specHash][parent].tests.push({
+                title: this.title,
+                state: this.state,
+                screenshots: this.screenshots,
+                error: this.error
               });
             }
           }
@@ -170,41 +180,44 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
           delete test.parent;
         });
         if (this.moduleName) {
-          const fileName = path.join(
+          const filePathLocation = path.join(
             this.resultsDir,
-            `${this.moduleName}_${this.fileName}.json`);
-          this.resultJsonObject.specs[this.moduleName] = revSpecs.shift();
-          fs.writeFileSync(
-            fileName,
-            `${JSON.stringify(this.resultJsonObject.specs[this.moduleName], null, 2)}`,
-            { flag: "w+" },
-            (err) => {
-              if (err) {
-                Logger.error(err.message, { context: LOG_CONTEXT });
-              }
-            }
+            `${this.fileName}.json`
           );
+          this.resultJsonObject.specs[this.moduleName] = revSpecs.shift();
+          this.writToFile(this.resultJsonObject.specs[this.moduleName], filePathLocation);
+          // fs.writeFileSync(
+          //   filePathLocation,
+          //   `${JSON.stringify(this.resultJsonObject.specs[this.moduleName], null, 2)}`,
+          //   { flag: "w+" },
+          //   (err) => {
+          //     if (err) {
+          //       Logger.error(err.message, { context: LOG_CONTEXT });
+          //     }
+          //   }
+          // );
         } else {
           this.nonMonoRepoResult.push(revSpecs.shift());
         }
       });
       if (!this.moduleName) {
         this.resultJsonObject.specs = this.nonMonoRepoResult;
+        const filePathLocation = path.join(
+          this.resultsDir,
+          `${this.fileName}.json`
+        );
+        this.writToFile(this.resultJsonObject, filePathLocation)
+        // fs.writeFileSync(
+        //   filePathLocation,
+        //   `${JSON.stringify(this.resultJsonObject, null, 2)}`,
+        //   { flag: "w+" },
+        //   (err) => {
+        //     if (err) {
+        //       Logger.error(err.message, { context: LOG_CONTEXT });
+        //     }
+        //   }
+        // );
       }
-      const filePathLocation = path.join(
-        this.resultsDir,
-        `${this.fileName}.json`
-      );
-      fs.writeFileSync(
-        filePathLocation,
-        `${JSON.stringify(this.resultJsonObject, null, 2)}`,
-        { flag: "w+" },
-        (err) => {
-          if (err) {
-            Logger.error(err.message, { context: LOG_CONTEXT });
-          }
-        }
-      );
       this.screenshots = [];
       this.specHashData = {};
     });
@@ -242,7 +255,7 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
 
   /**
    * Sets results directory for the test run. Uses the wdio reporterOptions.outputDir if set, otherwise
-   * it outputs to tests?/wdio/reports/details.
+   * it outputs to tests?/wdio/reports.
    * @return null;
    */
   setResultsDir() {
@@ -262,8 +275,11 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
    * Formatting the filename based on locale, theme, and formFactor
    * @return null
    */
-  fileNameCheck({ formFactor, locale, theme }, { browserName }) {
+  fileNameCheck({ formFactor, locale, theme }, { browserName }, moduleName) {
     const fileNameConf = ["result-details"];
+    if(moduleName) {
+      fileNameConf.push(moduleName);
+    }
     if (locale) {
       fileNameConf.push(locale);
       this.resultJsonObject.locale = locale;
@@ -286,7 +302,25 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
 
     this.fileName = fileNameConf.join("-");
   }
-}
+  /**
+   * writes data to the file 
+   * @param {string} data - Data that should be written to the file
+   * @param {string} filePath - Location of the file
+   * @return null
+   */
+  writToFile(data, filePath) {
+    fs.writeFileSync(
+      filePath,
+      `${JSON.stringify(data, null, 2)}`,
+      { flag: "w+" },
+      (err) => {
+        if (err) {
+          Logger.error(err.message, { context: LOG_CONTEXT });
+        }
+      }
+    );
+  }
+};
 
 TerraWDIOTestDetailsReporter.reporterName = "TerraWDIOTestDetailsReporter";
 module.exports = TerraWDIOTestDetailsReporter;

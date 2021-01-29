@@ -4,10 +4,10 @@ Wdio Test Details Reporter is a reporter that logs wdio visualRegression test ou
 
 - Locale, Form Factor, Browsers and Theme of the tests
 
-- Name of the tests, whether they've succeeded or failed and the screenshot link
+- Name of the tests, screenshot link, whether they've succeeded or failed if failed shows the error information
 
 **WDIO test output Directory**
-Terra WDIO Test Details Reporter logs the WDIO test output in tests/wdio/reports/details or test/wdio/reports/details depending on whether tests or test is the directory that contains specs
+Terra WDIO Test Details Reporter logs the WDIO test output in tests/wdio/reports or test/wdio/reports depending on whether tests or test is the directory that contains specs
 
 **Check for Mono Repo**
 Terra WDIO Test Details Reporter assumes mono-repo will have packages directory in the root folder
@@ -25,7 +25,7 @@ const TerraWDIOTestDetailsReporter = require('terra-toolkit/reporters/wdio/Terra
 
 ```
 
-Add event emitter in the visualRegressionConfig.js so that when ever a screenshot is taken a the screenshot link is send
+Add event emitter in the visualRegressionConfig.js so that when ever a screenshot is taken a the screenshot link is send to the Details Reporter
 
 ```javascript
 
@@ -41,7 +41,7 @@ screenshotName: (context) => {
 
 - The name of the log file for non-monorepo will be **result-details-\<locale>-\<theme>-\<form-factor>-\<browser>-\<repo-name>.json**(eg: result-details-en-huge-chrome-terra-toolkit-boneyard.json)
 
-- The name of the log file for mono-repo will be **result-details-\<locale>-\<theme>-\<form-factor>-\<browser>-<Package-name>.json**(eg: result-details-clinical-lowlight-theme-chrome-terra-clinical-data-grid.json)
+- The name of the log file for mono-repo will be **result-details-\<Package-name>\<locale>-\<theme>-\<form-factor>-\<browser>.json**(eg: result-details-terra-clinical-data-grid-clinical-lowlight-theme-chrome)
 
 - Example output  [a relative link](details-reporter-sample-results.json)
-- Example output for mono repo [a relative link](details-reporter-mono-repo-sample-results.json)
+- Example output when error occurs  [a relative link](details-reporter-sample-results-withError.json)
