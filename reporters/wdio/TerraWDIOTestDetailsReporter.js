@@ -4,6 +4,16 @@ const fs = require('fs');
 const Logger = require('../../scripts/utils/logger');
 
 const LOG_CONTEXT = '[Terra-Toolkit:terra-wdio-spec-details-reporter]';
+const detailEvents = {
+  latestScreenshot: 'terra-wdio:latest-screenshot',
+  runnerStart: 'runner:start',
+  suitStart: 'suite:start',
+  testStart: 'test:start',
+  testPass: 'test:pass',
+  testFail: 'test:fail',
+  testEnd: 'test:end',
+  runnerEnd: 'runner:end',
+};
 class TerraWDIOTestDetailsReporter extends events.EventEmitter {
   constructor(globalConfig, options) {
     super(globalConfig);
@@ -30,172 +40,185 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
     this.specHashData = {};
     this.nonMonoRepoResult = [];
     this.resultsDir = '';
+    this.registerListeners = this.registerListeners.bind(this);
+    this.registerListeners();
+  }
 
-    this.on('terra-wdio:latest-screenshot', (screenshotPath) => {
-      this.screenshots.push(screenshotPath.screenshotPath);
-    });
+  registerListeners() {
+    this.on(detailEvents.runnerStart, this.runnerStart.bind(this));
+    this.on(detailEvents.latestScreenshot, this.latestScreenshot.bind(this));
+    this.on(detailEvents.suitStart, this.suitStart.bind(this));
+    this.on(detailEvents.testStart, this.testStart.bind(this));
+    this.on(detailEvents.testPass, this.testPass.bind(this));
+    this.on(detailEvents.testFail, this.testFail.bind(this));
+    this.on(detailEvents.testEnd, this.testEnd.bind(this));
+    this.on(detailEvents.runnerEnd, this.runnerEnd.bind(this));
+  }
 
-    this.on('runner:start', (runner) => {
-      this.setTestModule(runner.specs[0]);
-      this.setResultsDir();
-      this.hasResultsDir();
-      this.resultJsonObject.locale = runner.config.locale;
-      this.resultJsonObject.capabilities.browserName = runner.config.browserName;
-      this.resultJsonObject.formFactor = runner.config.formFactor;
-      this.resultJsonObject.theme = runner.capabilities.theme || 'default-theme';
-      this.fileNameCheck(runner.config, runner.capabilities, this.moduleName);
-    });
+  latestScreenshot(screenshotPath) {
+    this.screenshots.push(screenshotPath.screenshotPath);
+  }
 
-    /**
-     * Format class member specHashData with runner's specHash. If its monorepo formatting the specHash inside the moduleName
-     * @param {Object} params
-     */
-    this.on('suite:start', (params) => {
-      const { specHash, title, parent } = params;
-      let { specHashData } = this;
-      if (this.moduleName) {
-        if (!this.specHashData[this.moduleName]) {
-          this.specHashData[this.moduleName] = {};
-          specHashData = this.specHashData;
-        }
-        if (!specHashData[this.moduleName][specHash]) {
-          specHashData[this.moduleName][specHash] = {};
-        }
-        if (!specHashData[this.moduleName][specHash][title]) {
-          specHashData[this.moduleName][specHash][title] = {
-            parent,
-            title,
-            tests: [],
-          };
-        }
-      } else {
-        if (!specHashData[specHash]) {
-          specHashData[specHash] = {};
-        }
-        if (!specHashData[specHash][title]) {
-          specHashData[specHash][title] = {
-            parent,
-            title,
-            tests: [],
-          };
-        }
+  runnerStart(runner) {
+    this.setTestModule(runner.specs[0]);
+    this.setResultsDir();
+    this.hasResultsDir();
+    this.resultJsonObject.locale = runner.config.locale;
+    this.resultJsonObject.capabilities.browserName = runner.config.browserName;
+    this.resultJsonObject.formFactor = runner.config.formFactor;
+    this.resultJsonObject.theme = runner.capabilities.theme || 'default-theme';
+    this.fileNameCheck(runner.config, runner.capabilities, this.moduleName);
+  }
+
+  /**
+   * Format class member specHashData with runner's specHash. If its monorepo formatting the specHash inside the moduleName
+   * @param {Object} params
+   */
+  suitStart(params) {
+    const { specHash, title, parent } = params;
+    let { specHashData } = this;
+    if (this.moduleName) {
+      if (!this.specHashData[this.moduleName]) {
+        this.specHashData[this.moduleName] = {};
+        specHashData = this.specHashData;
       }
-    });
-
-    this.on('test:start', (test) => {
-      this.title = test.title;
-    });
-
-    this.on('test:pass', () => {
-      this.state = 'success';
-    });
-
-    this.on('test:fail', (test) => {
-      this.error = {
-        name: 'Error',
-        message: test.err.message,
-        stack: test.err.stack,
-        type: test.err.type,
-      };
-      this.state = 'fail';
-    });
-
-    /**
-     * update specHashData with description, success, screenshots
-     * @param {Object} test
-     * @return null
-     */
-    this.on('test:end', (test) => {
-      const { specHash, parent } = test;
-      if (this.moduleName && this.specHashData[this.moduleName][specHash] && this.specHashData[this.moduleName][specHash][parent]) {
-        if (this.state !== 'fail') {
-          this.specHashData[this.moduleName][specHash][parent].tests.push({
-            title: this.title,
-            state: this.state,
-            screenshots: this.screenshots,
-          });
-        } else {
-          this.specHashData[this.moduleName][specHash][parent].tests.push({
-            title: this.title,
-            state: this.state,
-            screenshots: this.screenshots,
-            error: this.error,
-          });
-        }
-      } else if (this.specHashData[specHash] && this.specHashData[specHash][parent]) {
-        if (this.state !== 'fail') {
-          this.specHashData[specHash][parent].tests.push({
-            title: this.title,
-            state: this.state,
-            screenshots: this.screenshots,
-          });
-        } else {
-          this.specHashData[specHash][parent].tests.push({
-            title: this.title,
-            state: this.state,
-            screenshots: this.screenshots,
-            error: this.error,
-          });
-        }
+      if (!specHashData[this.moduleName][specHash]) {
+        specHashData[this.moduleName][specHash] = {};
       }
-    });
+      if (!specHashData[this.moduleName][specHash][title]) {
+        specHashData[this.moduleName][specHash][title] = {
+          parent,
+          title,
+          tests: [],
+        };
+      }
+    } else {
+      if (!specHashData[specHash]) {
+        specHashData[specHash] = {};
+      }
+      if (!specHashData[specHash][title]) {
+        specHashData[specHash][title] = {
+          parent,
+          title,
+          tests: [],
+        };
+      }
+    }
+  }
 
-    /**
-     * Format resultJsonObject based on parent and nest the tests
-     * @return null
-     */
-    this.on('runner:end', (runner) => {
-      const specData = this.moduleName ? this.specHashData[this.moduleName] : this.specHashData;
-      Object.values(specData).forEach((spec) => {
-        const revSpecs = Object.values(spec);
-        revSpecs.forEach((test, i) => {
-          if (test.parent === test.title) {
-            const { title, parent, ...rest } = revSpecs[i];
-            revSpecs[i] = {
-              title,
-              spec: runner.specs[0],
-              ...rest,
-            };
-          }
-          if (test.parent !== test.title) {
-            const parentIndex = revSpecs.findIndex(
-              (item) => item.title === test.parent,
-            );
+  testStart(test) {
+    this.title = test.title;
+  }
 
-            if (parentIndex > -1) {
-              if (!revSpecs[parentIndex].suites) {
-                revSpecs[parentIndex].suites = [];
-              }
-              revSpecs[parentIndex].suites.push(test);
-              // eslint-disable-next-line no-param-reassign
-              delete test.parent;
-            }
-          }
-          // eslint-disable-next-line no-param-reassign
-          delete test.parent;
+  testPass() {
+    this.state = 'success';
+  }
+
+  testFail(test) {
+    this.error = {
+      name: 'Error',
+      message: test.err.message,
+      stack: test.err.stack,
+      type: test.err.type,
+    };
+    this.state = 'fail';
+  }
+
+  /**
+   * update specHashData with description, success, screenshots
+   * @param {Object} test
+   * @return null
+   */
+  testEnd(test) {
+    const { specHash, parent } = test;
+    if (this.moduleName && this.specHashData[this.moduleName][specHash] && this.specHashData[this.moduleName][specHash][parent]) {
+      if (this.state !== 'fail') {
+        this.specHashData[this.moduleName][specHash][parent].tests.push({
+          title: this.title,
+          state: this.state,
+          screenshots: this.screenshots,
         });
-        if (this.moduleName) {
-          const filePathLocation = path.join(
-            this.resultsDir,
-            `${this.fileName}.json`,
-          );
-          this.resultJsonObject.specs[this.moduleName] = revSpecs.shift();
-          this.writToFile(this.resultJsonObject.specs[this.moduleName], filePathLocation);
-        } else {
-          this.nonMonoRepoResult.push(revSpecs.shift());
+      } else {
+        this.specHashData[this.moduleName][specHash][parent].tests.push({
+          title: this.title,
+          state: this.state,
+          screenshots: this.screenshots,
+          error: this.error,
+        });
+      }
+    } else if (this.specHashData[specHash] && this.specHashData[specHash][parent]) {
+      if (this.state !== 'fail') {
+        this.specHashData[specHash][parent].tests.push({
+          title: this.title,
+          state: this.state,
+          screenshots: this.screenshots,
+        });
+      } else {
+        this.specHashData[specHash][parent].tests.push({
+          title: this.title,
+          state: this.state,
+          screenshots: this.screenshots,
+          error: this.error,
+        });
+      }
+    }
+  }
+
+  /**
+   * Format resultJsonObject based on parent and nest the tests
+   * @return null
+   */
+  runnerEnd(runner) {
+    const specData = this.moduleName ? this.specHashData[this.moduleName] : this.specHashData;
+    Object.values(specData).forEach((spec) => {
+      const revSpecs = Object.values(spec);
+      revSpecs.forEach((test, i) => {
+        if (test.parent === test.title) {
+          const { title, parent, ...rest } = revSpecs[i];
+          revSpecs[i] = {
+            title,
+            spec: runner.specs[0],
+            ...rest,
+          };
         }
+        if (test.parent !== test.title) {
+          const parentIndex = revSpecs.findIndex(
+            (item) => item.title === test.parent,
+          );
+
+          if (parentIndex > -1) {
+            if (!revSpecs[parentIndex].suites) {
+              revSpecs[parentIndex].suites = [];
+            }
+            revSpecs[parentIndex].suites.push(test);
+            // eslint-disable-next-line no-param-reassign
+            delete test.parent;
+          }
+        }
+        // eslint-disable-next-line no-param-reassign
+        delete test.parent;
       });
-      if (!this.moduleName) {
-        this.resultJsonObject.specs = this.nonMonoRepoResult;
+      if (this.moduleName) {
         const filePathLocation = path.join(
           this.resultsDir,
           `${this.fileName}.json`,
         );
-        this.writToFile(this.resultJsonObject, filePathLocation);
+        this.resultJsonObject.specs[this.moduleName] = revSpecs.shift();
+        this.writToFile(this.resultJsonObject.specs[this.moduleName], filePathLocation);
+      } else {
+        this.nonMonoRepoResult.push(revSpecs.shift());
       }
-      this.screenshots = [];
-      this.specHashData = {};
     });
+    if (!this.moduleName) {
+      this.resultJsonObject.specs = this.nonMonoRepoResult;
+      const filePathLocation = path.join(
+        this.resultsDir,
+        `${this.fileName}.json`,
+      );
+      this.writToFile(this.resultJsonObject, filePathLocation);
+    }
+    this.screenshots = [];
+    this.specHashData = {};
   }
 
   /**
