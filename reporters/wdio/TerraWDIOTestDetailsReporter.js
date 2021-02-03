@@ -111,7 +111,7 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
   }
 
   testPass() {
-    this.state = 'success';
+    this.state = 'passed';
   }
 
   testFail(test) {
