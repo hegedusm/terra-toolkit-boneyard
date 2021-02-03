@@ -12,14 +12,14 @@
         "tests": [
           {
             "title": "Express correctly sets the application locale",
-            "state": "success",
+            "state": "passed",
             "screenshots": [
               "/opt/module/tests/wdio/__snapshots__/latest/en/chrome_tiny/i18n-spec/I18n_Locale[default].png"
             ]
           },
           {
             "title": "matches screenshot",
-            "state": "success",
+            "state": "passed",
             "screenshots": [
               "/opt/module/tests/wdio/__snapshots__/latest/en/chrome_tiny/i18n-spec/I18n_Locale[default].png"
             ]
@@ -40,7 +40,7 @@
                 "tests": [
                   {
                     "title": "checks element",
-                    "state": "success",
+                    "state": "passed",
                     "screenshots": [
                       "/opt/module/tests/wdio/__snapshots__/latest/en/chrome_tiny/validateElement-spec/full_implementation[default].png",
                       "/opt/module/tests/wdio/__snapshots__/latest/en/chrome_tiny/validateElement-spec/inaccessible_contrast[default].png"

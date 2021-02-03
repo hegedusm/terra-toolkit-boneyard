@@ -12,14 +12,14 @@
       "tests": [
         {
           "title": "Express correctly sets the application locale",
-          "state": "success",
+          "state": "passed",
           "screenshots": [
             "/opt/module/tests/wdio/__snapshots__/latest/en/chrome_huge/i18n-spec/I18n_Locale[default].png"
           ]
         },
         {
           "title": "matches screenshot",
-          "state": "success",
+          "state": "passed",
           "screenshots": [
             "/opt/module/tests/wdio/__snapshots__/latest/en/chrome_huge/i18n-spec/I18n_Locale[default].png"
           ]
@@ -40,7 +40,7 @@
               "tests": [
                 {
                   "title": "checks element",
-                  "state": "success",
+                  "state": "passed",
                   "screenshots": [
                     "/opt/module/tests/wdio/__snapshots__/latest/en/chrome_huge/validateElement-spec/full_implementation[default].png",
                     "/opt/module/tests/wdio/__snapshots__/latest/en/chrome_huge/validateElement-spec/inaccessible_contrast[default].png"
@@ -53,7 +53,7 @@
               "tests": [
                 {
                   "title": "checks element",
-                  "state": "success",
+                  "state": "passed",
                   "screenshots": [
                     "/opt/module/tests/wdio/__snapshots__/latest/en/chrome_huge/validateElement-spec/full_implementation[default].png",
                     "/opt/module/tests/wdio/__snapshots__/latest/en/chrome_huge/validateElement-spec/inaccessible_contrast[default].png"
@@ -71,32 +71,32 @@
       "tests": [
         {
           "title": "validates the body's caret-color is transparent by default",
-          "state": "success",
+          "state": "passed",
           "screenshots": []
         },
         {
           "title": "validates the textarea's caret-color is inherited as transparent",
-          "state": "success",
+          "state": "passed",
           "screenshots": []
         },
         {
           "title": "validates the input's caret-color is inherited as transparent",
-          "state": "success",
+          "state": "passed",
           "screenshots": []
         },
         {
           "title": "sets the input's caret-color to orange",
-          "state": "success",
+          "state": "passed",
           "screenshots": []
         },
         {
           "title": "sets the input's caret-color back to transparent",
-          "state": "success",
+          "state": "passed",
           "screenshots": []
         },
         {
           "title": "throws an error for a non-existent element",
-          "state": "success",
+          "state": "passed",
           "screenshots": []
         }
       ]
