@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+* Added
+  * Terra Wdio Test Details Reporter that logs wdio visualRegression test output to a json file.
+
 ## 6.13.0 - (February 2, 2021)
 
 * Updated
