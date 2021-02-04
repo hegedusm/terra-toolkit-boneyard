@@ -76,17 +76,17 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
    */
   suitStart(params) {
     const { specHash, title, parent } = params;
-    let { specHashData } = this;
-    if (this.moduleName) {
-      if (!this.specHashData[this.moduleName]) {
-        this.specHashData[this.moduleName] = {};
-        specHashData = this.specHashData;
+    let { specHashData, moduleName } = this;
+    if (moduleName) {
+      if (!specHashData[moduleName]) {
+        specHashData[moduleName] = {};
+        specHashData = specHashData;
       }
-      if (!specHashData[this.moduleName][specHash]) {
-        specHashData[this.moduleName][specHash] = {};
+      if (!specHashData[moduleName][specHash]) {
+        specHashData[moduleName][specHash] = {};
       }
-      if (!specHashData[this.moduleName][specHash][title]) {
-        specHashData[this.moduleName][specHash][title] = {
+      if (!specHashData[moduleName][specHash][title]) {
+        specHashData[moduleName][specHash][title] = {
           parent,
           title,
           tests: [],
@@ -131,30 +131,32 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
    */
   testEnd(test) {
     const { specHash, parent } = test;
-    if (this.moduleName && this.specHashData[this.moduleName][specHash] && this.specHashData[this.moduleName][specHash][parent]) {
+    let { specHashData, moduleName } = this;
+    if (moduleName && specHashData[moduleName][specHash] && specHashData[moduleName][specHash][parent]) {
+      const tests = specHashData[moduleName][specHash][parent].tests;
       if (this.state !== 'fail') {
-        this.specHashData[this.moduleName][specHash][parent].tests.push({
+        tests.push({
           title: this.title,
           state: this.state,
           screenshots: this.screenshots,
         });
       } else {
-        this.specHashData[this.moduleName][specHash][parent].tests.push({
+        tests.push({
           title: this.title,
           state: this.state,
           screenshots: this.screenshots,
           error: this.error,
         });
       }
-    } else if (this.specHashData[specHash] && this.specHashData[specHash][parent]) {
+    } else if (specHashData[specHash] && specHashData[specHash][parent]) {
       if (this.state !== 'fail') {
-        this.specHashData[specHash][parent].tests.push({
+        specHashData[specHash][parent].tests.push({
           title: this.title,
           state: this.state,
           screenshots: this.screenshots,
         });
       } else {
-        this.specHashData[specHash][parent].tests.push({
+        specHashData[specHash][parent].tests.push({
           title: this.title,
           state: this.state,
           screenshots: this.screenshots,
@@ -309,16 +311,15 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
    */
   // eslint-disable-next-line class-methods-use-this
   writToFile(data, filePath) {
-    fs.writeFileSync(
-      filePath,
-      `${JSON.stringify(data, null, 2)}`,
-      { flag: 'w+' },
-      (err) => {
-        if (err) {
-          Logger.error(err.message, { context: LOG_CONTEXT });
-        }
-      },
-    );
+    try {
+      fs.writeFileSync(
+        filePath,
+        `${JSON.stringify(data, null, 2)}`,
+        { flag: 'w+' }
+      );
+    } catch (err) {
+      Logger.error(err.message, { context: LOG_CONTEXT });
+    }
   }
 }
 
