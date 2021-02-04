@@ -76,11 +76,10 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
    */
   suitStart(params) {
     const { specHash, title, parent } = params;
-    let { specHashData, moduleName } = this;
+    const { specHashData, moduleName } = this;
     if (moduleName) {
       if (!specHashData[moduleName]) {
         specHashData[moduleName] = {};
-        specHashData = specHashData;
       }
       if (!specHashData[moduleName][specHash]) {
         specHashData[moduleName][specHash] = {};
@@ -131,9 +130,9 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
    */
   testEnd(test) {
     const { specHash, parent } = test;
-    let { specHashData, moduleName } = this;
+    const { specHashData, moduleName } = this;
     if (moduleName && specHashData[moduleName][specHash] && specHashData[moduleName][specHash][parent]) {
-      const tests = specHashData[moduleName][specHash][parent].tests;
+      const { tests } = specHashData[moduleName][specHash][parent];
       if (this.state !== 'fail') {
         tests.push({
           title: this.title,
@@ -315,7 +314,7 @@ class TerraWDIOTestDetailsReporter extends events.EventEmitter {
       fs.writeFileSync(
         filePath,
         `${JSON.stringify(data, null, 2)}`,
-        { flag: 'w+' }
+        { flag: 'w+' },
       );
     } catch (err) {
       Logger.error(err.message, { context: LOG_CONTEXT });
