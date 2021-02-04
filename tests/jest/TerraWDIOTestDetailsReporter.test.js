@@ -150,8 +150,8 @@ describe.only('TerraWDIOTestDetailsReporter', () => {
   describe('reaches test:pass or test:fail', () => {
     it('test:pass description should set ', () => {
       const reporter = new TerraWDIOTestDetailsReporter({}, {});
-      reporter.emit('test:pass', { state: 'success' });
-      expect(reporter.state).toEqual('success');
+      reporter.emit('test:pass', { state: 'passed' });
+      expect(reporter.state).toEqual('passed');
     });
     it('test:fail description should set ', () => {
       const reporter = new TerraWDIOTestDetailsReporter({}, {});
@@ -259,11 +259,11 @@ describe.only('TerraWDIOTestDetailsReporter', () => {
                    tests: [
                      {
                        title: 'Express correctly sets the application locale',
-                       state: 'success',
+                       state: 'passed',
                      },
                      {
                        title: '[default] to be within the mismatch tolerance',
-                       state: 'success',
+                       state: 'passed',
                        screenshotLink: '/opt/module/tests/wdio/__snapshots__/latest/fr/chrome_huge/i18n-spec/I18n_Locale[default].png',
                      },
                    ],
@@ -302,7 +302,7 @@ describe.only('TerraWDIOTestDetailsReporter', () => {
             tests: [
               {
                 title: "validates the textarea's caret-color is inherited as transparent",
-                state: 'success',
+                state: 'passed',
                 screenshotLink: '/opt/module/tests/wdio/__snapshots__/latest/en/chrome_tiny/validateElement-spec/full_implementation[default].png',
               },
             ],
