@@ -8,10 +8,12 @@ const packageJson = require('../../package.json');
 commander
   .version(packageJson.version)
   .option('--removeReference', 'Whether or not to remove the reference screenshots', false)
+  .option('--snapshotDirectory', 'The directory that clean should check for snapshots folders')
   .parse(process.argv);
 
 const {
   removeReference,
+  snapshotDirectory,
 } = commander;
 
-cleanScreenshots({ removeReference });
+cleanScreenshots({ removeReference, snapshotDirectory });

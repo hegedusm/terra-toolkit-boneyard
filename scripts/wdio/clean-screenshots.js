@@ -8,17 +8,20 @@ const isDirectory = filePath => (fs.existsSync(filePath) && fs.lstatSync(filePat
 const cleanSnapshots = (options) => {
   const {
     removeReference,
+    snapshotDirectory,
   } = options;
 
+  const snapshotRoot = snapshotDirectory ? `${snapshotDirectory}/**` : '**';
+
   const patterns = [
-    `${process.cwd()}/**/__snapshots__/latest`,
-    `${process.cwd()}/**/__snapshots__/diff`,
-    `${process.cwd()}/**/__snapshots__/screen`,
+    `${process.cwd()}/${snapshotRoot}/__snapshots__/latest`,
+    `${process.cwd()}/${snapshotRoot}/__snapshots__/diff`,
+    `${process.cwd()}/${snapshotRoot}/__snapshots__/screen`,
     `${process.cwd()}/errorScreenshots`,
   ];
 
   if (removeReference) {
-    patterns.push(`${process.cwd()}/**/__snapshots__/reference`);
+    patterns.push(`${process.cwd()}/${snapshotRoot}/__snapshots__/reference`);
   }
 
   let screenshotDirectories = [];
