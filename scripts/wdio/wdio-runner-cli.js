@@ -19,6 +19,7 @@ commander
   .option('--gridUrl [url]', 'The selenium grid url to run tests against', undefined)
   .option('--continueOnFail', 'Pass to continue executing test runs when a run fails', false)
   .option('--updateReference', 'Pass to remove all reference screenshots during screenshot cleanup', false)
+  .option('--snapshotDirectory [string]', 'The directory that clean should check for snapshots folders', undefined)
   .option('--host [number]', '[wdio option] The selenium server port', undefined)
   .option('--port [string]', '[wdio option] The selenium server host address', undefined)
   .option('--baseUrl [path]', '[wdio option] The base URL', undefined)
@@ -40,12 +41,14 @@ const {
   suite,
   spec,
   updateReference,
+  snapshotDirectory,
 } = commander;
 
 const configPath = getWdioConfigPath(config);
 
 cleanScreenshots({
   updateReference,
+  snapshotDirectory,
 });
 
 runner({
