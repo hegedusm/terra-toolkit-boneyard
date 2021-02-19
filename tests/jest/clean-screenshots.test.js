@@ -1,12 +1,11 @@
-jest.mock('fs-extra');
-jest.mock('glob');
-
 import fs from 'fs-extra';
 import glob from 'glob';
 import cleanSnapshots from '../../scripts/wdio/clean-screenshots';
 
-describe('cleanSnapshots', () => {
+jest.mock('fs-extra');
+jest.mock('glob');
 
+describe('cleanSnapshots', () => {
   const originalProcessCwd = process.cwd;
   beforeAll(() => {
     process.cwd = jest.fn().mockImplementation(() => './terra-toolkit-boneyard');
@@ -22,9 +21,9 @@ describe('cleanSnapshots', () => {
 
   const setupMocks = () => {
     fs.existsSync.mockReturnValue(true);
-    fs.lstatSync.mockReturnValue({ isDirectory: () => true })
+    fs.lstatSync.mockReturnValue({ isDirectory: () => true });
     glob.sync.mockImplementation((path) => `${path}/test`);
-  }
+  };
 
   describe('searches snapshots', () => {
     const expectToSearchUnder = (path) => {
@@ -33,7 +32,7 @@ describe('cleanSnapshots', () => {
       expect(glob.sync).toHaveBeenCalledWith(`${process.cwd()}/${path}/__snapshots__/screen`);
       expect(glob.sync).toHaveBeenCalledWith(`${process.cwd()}/errorScreenshots`);
       expect(glob.sync).toHaveBeenCalledWith(`${process.cwd()}/${path}/__snapshots__/reference`);
-    }
+    };
 
     it('under cwd when snapshot directory is undefined', () => {
       setupMocks();
@@ -43,16 +42,16 @@ describe('cleanSnapshots', () => {
 
     it.each`
       snapshotDirectory                   | expectedSearchPath
-      ${""}                               | ${'**'}
+      ${''}                               | ${'**'}
       ${'snapshotDirectory'}              | ${'snapshotDirectory/**'}
       ${'snapshotDirectory/subDirectory'} | ${'snapshotDirectory/subDirectory/**'}`(
-      'under $expectedSearchPath when snapshot directory is $snapshotDirectory',
-      ({ snapshotDirectory, expectedSearchPath }) => {
-        setupMocks();
-        cleanSnapshots({ snapshotDirectory, removeReference: true });
-        expectToSearchUnder(expectedSearchPath);
-      },
-    );
+  'under $expectedSearchPath when snapshot directory is $snapshotDirectory',
+  ({ snapshotDirectory, expectedSearchPath }) => {
+    setupMocks();
+    cleanSnapshots({ snapshotDirectory, removeReference: true });
+    expectToSearchUnder(expectedSearchPath);
+  },
+);
   });
 
   describe('deletes snapshots', () => {
@@ -72,16 +71,15 @@ describe('cleanSnapshots', () => {
 
     it.each`
       snapshotDirectory                   | expectedDeletePath
-      ${""}                               | ${'**'}
+      ${''}                               | ${'**'}
       ${'snapshotDirectory'}              | ${'snapshotDirectory/**'}
       ${'snapshotDirectory/subDirectory'} | ${'snapshotDirectory/subDirectory/**'}`(
-      'under $expectedDeletePath when snapshot directory is $snapshotDirectory',
-      ({ snapshotDirectory, expectedDeletePath }) => {
-        setupMocks();
-        cleanSnapshots({ snapshotDirectory, removeReference: true });
-        expectToDeleteUnder(expectedDeletePath);
-      },
-    );
-  })
-
+  'under $expectedDeletePath when snapshot directory is $snapshotDirectory',
+  ({ snapshotDirectory, expectedDeletePath }) => {
+    setupMocks();
+    cleanSnapshots({ snapshotDirectory, removeReference: true });
+    expectToDeleteUnder(expectedDeletePath);
+  },
+);
+  });
 });
