@@ -4,6 +4,7 @@ module.exports = {
     'config/**/*.js',
     'reporters/**/*.js',
     'scripts/aggregate-themes/**/*.js',
+    'scripts/wdio/clean-screenshots.js',
   ],
   coverageDirectory: 'tests/jest/reports/coverage',
   coverageReporters: [
